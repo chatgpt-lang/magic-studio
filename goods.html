@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Goods Banner Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a12;--surface:#12121e;--surface2:#1a1a2e;--border:rgba(255,255,255,.08);--accent:#7c3aed;--accent2:#a855f7;--green:#8a9a28;--text:#e8e8f0;--muted:#777797;--error:#ef4444;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding:40px 20px 80px}
+.container{max-width:960px;margin:0 auto}
+.header{text-align:center;margin-bottom:28px}
+.header-eyebrow{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:4px;color:var(--accent2);display:block;margin-bottom:12px}
+h1{font-family:'Bebas Neue',sans-serif;font-size:60px;letter-spacing:2px;line-height:.95;background:linear-gradient(135deg,#fff 0%,var(--accent2) 65%,var(--green) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px}
+.header p{color:var(--muted);font-size:14px}
+.template-switch{display:flex;justify-content:center;gap:10px;margin:18px 0 0;flex-wrap:wrap}
+.template-switch a{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--muted);text-decoration:none;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;transition:all .2s}
+.template-switch a.active,.template-switch a:hover{border-color:var(--accent2);color:var(--accent2);background:rgba(124,58,237,.14)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:16px;position:relative;overflow:hidden}
+.card:before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.6}
+.card-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--accent2);display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.num{width:24px;height:24px;background:var(--accent);border-radius:50%;font-size:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'DM Sans',sans-serif;font-weight:800}
+.upload-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.upload-grid.five{grid-template-columns:repeat(5,1fr)}
+.bulk-upload{display:flex;align-items:center;justify-content:center;gap:10px;position:relative;margin-bottom:14px;padding:13px 16px;border:1.5px dashed var(--accent2);border-radius:12px;background:rgba(124,58,237,.12);color:var(--text);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.bulk-upload:hover{background:rgba(124,58,237,.22)}
+.bulk-upload input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.bulk-upload-status{min-height:18px;margin:-6px 0 12px;color:var(--muted);font-size:11px;text-align:center}
+.upload-zone{position:relative;border:1.5px dashed var(--border);border-radius:12px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2);min-height:118px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.upload-zone:hover{border-color:var(--accent);background:rgba(124,58,237,.08)}
+.upload-zone.has-file{border-color:var(--green);background:rgba(138,154,40,.08)}
+.upload-zone.uploading{border-color:var(--accent2);background:rgba(168,85,247,.08)}
+.upload-zone.error{border-color:var(--error);background:rgba(239,68,68,.08)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-icon{font-size:26px}
+.upload-label{font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.upload-sub{font-size:10px;color:var(--muted);opacity:.65}
+.quality-hint{display:block;margin-top:3px;font-size:10px;line-height:1.25;font-weight:700;color:#86efac}
+.quality-hint.warn{color:#fbbf24}
+.preview-img{width:58px;height:58px;object-fit:contain;border-radius:6px;display:none}
+.upload-zone.has-file .preview-img{display:block}.upload-zone.has-file .upload-icon,.upload-zone.uploading .upload-icon{display:none}
+.spinner-small{width:24px;height:24px;border:2px solid rgba(168,85,247,.3);border-top-color:var(--accent2);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.field input,.field select,.field textarea{background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none}
+.field textarea{min-height:78px;resize:vertical;line-height:1.35}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent2)}
+.toggle-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.toggle-row.logo-toggles{grid-template-columns:repeat(5,1fr)}
+.toggle-pill{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.toggle-pill input{accent-color:var(--accent2)}
+.glow-control{display:flex;align-items:center;gap:10px}
+.glow-control input[type=color]{flex:1;min-width:54px}
+.glow-control input[type=color]:disabled{opacity:.35}
+.product-controls{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:16px}
+.product-control{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px}
+.product-control[data-product-control],.product-control[data-logo-control]{position:relative;transition:border-color .2s,background .2s,box-shadow .2s}
+.product-control.selected-product-control{border-color:#fbbf24;background:rgba(251,191,36,.13);box-shadow:0 0 0 2px rgba(251,191,36,.22),0 10px 28px rgba(0,0,0,.24)}
+.product-control.selected-product-control:after{content:'SÉLECTIONNÉ';position:absolute;right:9px;top:9px;padding:4px 7px;border-radius:999px;background:#fbbf24;color:#17120a;font-size:8px;font-weight:900;letter-spacing:.8px}
+.product-control.selected-product-control .product-control-title{color:#fbbf24;padding-right:78px}
+.product-control-title{font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--accent2);margin-bottom:10px}
+.slider-row{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.slider-row:last-child{margin-bottom:0}
+.slider-label{display:flex;justify-content:space-between;gap:8px}
+.slider-label span{font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.6px}
+.slider-label .val{color:var(--text)}
+#banner-text-color{width:100%;height:38px;padding:3px;border:1px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer}
+input[type=range]{width:100%;height:3px;-webkit-appearance:none;background:var(--border);border-radius:2px;outline:none;cursor:pointer;accent-color:var(--accent2)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent2);border:2px solid var(--bg)}
+.hint{font-size:12px;color:#fbbf24;margin-top:10px}
+.preview-card{display:none;background:var(--surface);border:1px solid rgba(168,85,247,.3);border-radius:16px;padding:18px;margin-top:16px}
+.preview-card.show{display:block;position:sticky;top:10px;z-index:100;box-shadow:0 18px 42px rgba(0,0,0,.58)}
+#controlDock{display:none}
+.control-dock{margin-top:16px}
+.editor-layout.vertical{display:grid;grid-template-columns:minmax(470px,620px) minmax(480px,1fr);gap:16px;align-items:start}
+.editor-layout.vertical .preview-card.show,.editor-layout.vertical .control-dock{position:sticky;top:10px}
+.editor-layout.vertical .control-dock{max-height:calc(100vh - 20px);overflow:auto}
+.editor-layout.vertical .product-controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+body.vertical-editor .container{max-width:1500px}
+.text-toolbar{display:none;align-items:center;gap:12px;margin:18px 0 4px;padding:12px;border:1px solid rgba(168,85,247,.35);border-radius:12px;background:rgba(124,58,237,.1)}
+.text-toolbar.show{display:flex}
+.add-text-btn{border:0;border-radius:9px;padding:11px 14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font:800 11px 'DM Sans',sans-serif;letter-spacing:.8px;text-transform:uppercase;cursor:pointer}
+.text-toolbar span{font-size:11px;color:var(--muted);line-height:1.4}
+.reset-format-btn{width:auto;padding:10px 15px;border:1px solid var(--border);border-radius:9px;background:var(--surface2);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin-top:18px}
+.reset-format-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tab{background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:8px 13px;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);cursor:pointer}
+.tab.active{background:rgba(124,58,237,.2);border-color:var(--accent);color:var(--accent2)}
+.preview-wrap{background:repeating-conic-gradient(#20202b 0 25%,#262633 0 50%) 50%/24px 24px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+iframe{width:100%;border:0;display:block;transform-origin:top left}
+.btn{width:100%;padding:16px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:3px;cursor:pointer;margin-top:14px}
+.links{display:none;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-top:16px}
+.links.show{display:block}
+.result-url{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--muted);word-break:break-all;margin:8px 0 12px;display:flex;gap:8px;justify-content:space-between;align-items:center}
+.copy-btn{background:var(--accent);border:0;border-radius:6px;padding:5px 10px;color:white;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap}
+.btn-hd{background:linear-gradient(135deg,#ec4899,#7c3aed)}
+.btn-video{background:linear-gradient(135deg,#0ea5e9,#7c3aed)}
+.btn:disabled{opacity:.55;cursor:wait}
+.hd-status{display:none;margin-top:16px;padding:16px;border:1px solid var(--border);border-radius:12px;background:var(--surface);font-size:14px;line-height:1.5}
+.hd-status.show{display:block}
+.hd-status.success{border-color:#22c55e;color:#bbf7d0}
+.hd-status.error{border-color:#ef4444;color:#fecaca}
+.hd-downloads{display:none;margin-top:12px;grid-template-columns:repeat(3,1fr);gap:10px}
+.hd-downloads.show{display:grid}
+.hd-download{display:flex;align-items:center;justify-content:center;padding:13px 10px;border:1px solid #22c55e;border-radius:10px;background:rgba(34,197,94,.12);color:#bbf7d0;text-decoration:none;font-size:12px;font-weight:800;letter-spacing:.7px;text-transform:uppercase}
+.hd-download:hover{background:rgba(34,197,94,.22)}
+.video-export-panel{margin-top:16px;padding:16px;border:1px solid rgba(56,189,248,.32);border-radius:14px;background:rgba(14,165,233,.07)}
+.video-export-title{font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#bae6fd}
+.video-format-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+.video-format-choice{display:flex;align-items:center;gap:9px;min-width:0;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);cursor:pointer}
+.video-format-choice:has(input:checked){border-color:#38bdf8;background:rgba(14,165,233,.15)}
+.video-format-choice input{accent-color:#38bdf8;flex:0 0 auto}
+.video-format-choice strong{display:block;font-size:11px;line-height:1.15;letter-spacing:.7px;text-transform:uppercase}
+.video-format-choice small{display:block;margin-top:3px;color:var(--muted);font-size:10px}
+.video-export-note{margin-top:10px;color:var(--muted);font-size:11px;line-height:1.45}
+@media(max-width:760px){.video-format-options{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.hd-downloads,.video-format-options{grid-template-columns:1fr}}
+.background-mode{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.background-choice{display:flex;align-items:flex-start;gap:10px;padding:13px;background:var(--surface2);border:1px solid var(--border);border-radius:11px;cursor:pointer}
+.background-choice:has(input:checked){border-color:var(--accent2);background:rgba(124,58,237,.15)}
+.background-choice input{margin-top:2px;accent-color:var(--accent2)}
+.background-choice strong{display:block;font-size:12px;letter-spacing:.7px;text-transform:uppercase}
+.background-choice small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.background-panel[hidden]{display:none}
+.background-prompt{margin-top:10px}
+@media(max-width:620px){.background-mode{grid-template-columns:1fr}}
+@media(max-width:1100px){.editor-layout.vertical{display:block}.editor-layout.vertical .preview-card.show,.editor-layout.vertical .control-dock{position:relative;top:auto;max-height:none;overflow:visible}}
+@media(max-width:900px){.product-controls,.editor-layout.vertical .product-controls{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){body{padding:20px 10px 40px}.header{margin-bottom:18px}.upload-grid,.upload-grid.five,.field-row,.product-controls,.editor-layout.vertical .product-controls,.toggle-row{grid-template-columns:1fr}.card{padding:22px}h1{font-size:48px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <span class="header-eyebrow">GOODS TEMPLATE</span>
+    <h1>PRODUCT<br>GENERATOR</h1>
+    <p>Template produits sans texte : 5 logos, 1 à 20 produits détourables, formats web / mobile / story.</p>
+    <div class="template-switch">
+      <a href="index.html">Banner TCG</a>
+      <a href="goods.html" class="active">Goods / Produits</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="num">1</span> Logos / visuels de gauche</div>
+    <div class="upload-grid five logo-upload-grid">
+      <div class="upload-zone" id="zone-left1">
+        <input type="file" accept="image/*" onchange="uploadToCloudinary(this,'left1_url','zone-left1','prev-left1')">
+        <span class="upload-icon">🏷️</span><div class="spinner-small" style="display:none" id="spin-left1"></div><img class="preview-img" id="prev-left1">
+        <span class="upload-label">Image gauche 1</span><span class="upload-sub">Logo / badge - détourable</span>
+      </div>
+      <div class="upload-zone" id="zone-left2">
+        <input type="file" accept="image/*" onchange="uploadToCloudinary(this,'left2_url','zone-left2','prev-left2')">
+        <span class="upload-icon">🔥</span><div class="spinner-small" style="display:none" id="spin-left2"></div><img class="preview-img" id="prev-left2">
+        <span class="upload-label">Image gauche 2</span><span class="upload-sub">Logo série - détourable</span>
+      </div>
+      <div class="upload-zone" id="zone-left3">
+        <input type="file" accept="image/*" onchange="uploadToCloudinary(this,'left3_url','zone-left3','prev-left3')">
+        <span class="upload-icon">🟧</span><div class="spinner-small" style="display:none" id="spin-left3"></div><img class="preview-img" id="prev-left3">
+        <span class="upload-label">Image gauche 3</span><span class="upload-sub">Bouton / label - détourable</span>
+      </div>
+      <div class="upload-zone" id="zone-left4">
+        <input type="file" accept="image/*" onchange="uploadToCloudinary(this,'left4_url','zone-left4','prev-left4')">
+        <span class="upload-icon">✨</span><div class="spinner-small" style="display:none" id="spin-left4"></div><img class="preview-img" id="prev-left4">
+        <span class="upload-label">Image gauche 4</span><span class="upload-sub">Logo complémentaire - détourable</span>
+      </div>
+      <div class="upload-zone" id="zone-left5">
+        <input type="file" accept="image/*" onchange="uploadToCloudinary(this,'left5_url','zone-left5','prev-left5')">
+        <span class="upload-icon">⭐</span><div class="spinner-small" style="display:none" id="spin-left5"></div><img class="preview-img" id="prev-left5">
+        <span class="upload-label">Image gauche 5</span><span class="upload-sub">Logo complémentaire - détourable</span>
+      </div>
+    </div>
+    <div class="toggle-row logo-toggles">
+      <label class="toggle-pill"><input type="checkbox" id="show_left1" checked onchange="sendToIframe()"> Afficher logo 1</label>
+      <label class="toggle-pill"><input type="checkbox" id="show_left2" checked onchange="sendToIframe()"> Afficher logo 2</label>
+      <label class="toggle-pill"><input type="checkbox" id="show_left3" checked onchange="sendToIframe()"> Afficher logo 3</label>
+      <label class="toggle-pill"><input type="checkbox" id="show_left4" checked onchange="sendToIframe()"> Afficher logo 4</label>
+      <label class="toggle-pill"><input type="checkbox" id="show_left5" checked onchange="sendToIframe()"> Afficher logo 5</label>
+    </div>
+    <div class="product-controls logo-controls">
+      <div class="product-control">
+        <div class="product-control-title">Logo 1</div>
+        <div class="slider-row"><div class="slider-label"><span>Taille</span><span class="val" id="val-left1-size">100%</span></div><input type="range" id="left1-size" min="10" max="400" value="100" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Gauche / Droite</span><span class="val" id="val-left1-x">0px</span></div><input type="range" id="left1-x" min="-300" max="300" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Haut / Bas</span><span class="val" id="val-left1-y">0px</span></div><input type="range" id="left1-y" min="-220" max="220" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Rotation</span><span class="val" id="val-left1-rot">0°</span></div><input type="range" id="left1-rot" min="-180" max="180" value="0" oninput="onElementSlider(this)"></div>
+      </div>
+      <div class="product-control">
+        <div class="product-control-title">Logo 2</div>
+        <div class="slider-row"><div class="slider-label"><span>Taille</span><span class="val" id="val-left2-size">100%</span></div><input type="range" id="left2-size" min="10" max="400" value="100" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Gauche / Droite</span><span class="val" id="val-left2-x">0px</span></div><input type="range" id="left2-x" min="-300" max="300" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Haut / Bas</span><span class="val" id="val-left2-y">0px</span></div><input type="range" id="left2-y" min="-220" max="220" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Rotation</span><span class="val" id="val-left2-rot">0°</span></div><input type="range" id="left2-rot" min="-180" max="180" value="0" oninput="onElementSlider(this)"></div>
+      </div>
+      <div class="product-control">
+        <div class="product-control-title">Logo 3</div>
+        <div class="slider-row"><div class="slider-label"><span>Taille</span><span class="val" id="val-left3-size">100%</span></div><input type="range" id="left3-size" min="10" max="400" value="100" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Gauche / Droite</span><span class="val" id="val-left3-x">0px</span></div><input type="range" id="left3-x" min="-300" max="300" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Haut / Bas</span><span class="val" id="val-left3-y">0px</span></div><input type="range" id="left3-y" min="-220" max="220" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Rotation</span><span class="val" id="val-left3-rot">0°</span></div><input type="range" id="left3-rot" min="-180" max="180" value="0" oninput="onElementSlider(this)"></div>
+      </div>
+      <div class="product-control">
+        <div class="product-control-title">Logo 4</div>
+        <div class="slider-row"><div class="slider-label"><span>Taille</span><span class="val" id="val-left4-size">100%</span></div><input type="range" id="left4-size" min="10" max="400" value="100" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Gauche / Droite</span><span class="val" id="val-left4-x">0px</span></div><input type="range" id="left4-x" min="-300" max="300" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Haut / Bas</span><span class="val" id="val-left4-y">0px</span></div><input type="range" id="left4-y" min="-220" max="220" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Rotation</span><span class="val" id="val-left4-rot">0°</span></div><input type="range" id="left4-rot" min="-180" max="180" value="0" oninput="onElementSlider(this)"></div>
+      </div>
+      <div class="product-control">
+        <div class="product-control-title">Logo 5</div>
+        <div class="slider-row"><div class="slider-label"><span>Taille</span><span class="val" id="val-left5-size">100%</span></div><input type="range" id="left5-size" min="10" max="400" value="100" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Gauche / Droite</span><span class="val" id="val-left5-x">0px</span></div><input type="range" id="left5-x" min="-300" max="300" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Haut / Bas</span><span class="val" id="val-left5-y">0px</span></div><input type="range" id="left5-y" min="-220" max="220" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Rotation</span><span class="val" id="val-left5-rot">0°</span></div><input type="range" id="left5-rot" min="-180" max="180" value="0" oninput="onElementSlider(this)"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="num">2</span> Produits</div>
+    <div class="field-row" style="margin-bottom:14px">
+      <div class="field">
+        <label>Nombre de produits</label>
+        <select id="figure_count" onchange="updateFigureVisibility();sendToIframe()">
+          <option value="1">1 produit</option>
+          <option value="2">2 produits</option>
+          <option value="3" selected>3 produits</option>
+          <option value="4">4 produits</option>
+          <option value="5">5 produits</option>
+          <option value="6">6 produits</option>
+          <option value="7">7 produits</option>
+          <option value="8">8 produits</option>
+          <option value="9">9 produits</option>
+          <option value="10">10 produits</option>
+          <option value="11">11 produits</option>
+          <option value="12">12 produits</option>
+          <option value="13">13 produits</option>
+          <option value="14">14 produits</option>
+          <option value="15">15 produits</option>
+          <option value="16">16 produits</option>
+          <option value="17">17 produits</option>
+          <option value="18">18 produits</option>
+          <option value="19">19 produits</option>
+          <option value="20">20 produits</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Lueur produits</label>
+        <div class="glow-control">
+          <input type="color" id="product_glow" value="#ffffff" oninput="sendToIframe()">
+          <label class="toggle-pill"><input type="checkbox" id="product_glow_enabled" checked onchange="toggleProductGlow()"> Avec lueur</label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Texte Story / Vidéo</label>
+        <textarea id="series_text" oninput="sendToIframe()" placeholder="Série maintenant disponible !">Série maintenant disponible !</textarea>
+      </div>
+      <div class="field">
+        <label>Couleur Story / Vidéo</label>
+        <select id="series_text_color" onchange="sendToIframe()">
+          <option value="#ffffff" selected>Blanc</option>
+          <option value="#000000">Noir</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Texte Web / Mobile</label>
+        <textarea id="banner_text" oninput="sendToIframe()" placeholder="Maintenant disponible">Maintenant disponible</textarea>
+      </div>
+    </div>
+    <label class="bulk-upload">
+      <input type="file" accept="image/*" multiple onchange="uploadProductsBulk(this)">
+      <span>📦 Ajouter plusieurs produits en une fois</span>
+    </label>
+    <div class="bulk-upload-status" id="bulkUploadStatus" role="status" aria-live="polite"></div>
+    <div class="upload-grid five product-upload-grid">
+      <div class="upload-zone fig-zone" id="zone-fig1">
+        <input type="file" accept="image/*" onchange="uploadToCloudinary(this,'figure1_url','zone-fig1','prev-fig1')">
+        <span class="upload-icon">🧍</span><div class="spinner-small" style="display:none" id="spin-fig1"></div><img class="preview-img" id="prev-fig1">
+        <span class="upload-label">Produit 1</span><span class="upload-sub">PNG - détourable</span>
+      </div>
+      <div class="upload-zone fig-zone" id="zone-fig2">
+        <input type="file" accept="image/*" onchange="uploadToCloudinary(this,'figure2_url','zone-fig2','prev-fig2')">
+        <span class="upload-icon">🧍</span><div class="spinner-small" style="display:none" id="spin-fig2"></div><img class="preview-img" id="prev-fig2">
+        <span class="upload-label">Produit 2</span><span class="upload-sub">PNG - détourable</span>
+      </div>
+      <div class="upload-zone fig-zone" id="zone-fig3">
+        <input type="file" accept="image/*" onchange="uploadToCloudinary(this,'figure3_url','zone-fig3','prev-fig3')">
+        <span class="upload-icon">🧍</span><div class="spinner-small" style="display:none" id="spin-fig3"></div><img class="preview-img" id="prev-fig3">
+        <span class="upload-label">Produit 3</span><span class="upload-sub">PNG - détourable</span>
+      </div>
+      <div class="upload-zone fig-zone" id="zone-fig4">
+        <input type="file" accept="image/*" onchange="uploadToCloudinary(this,'figure4_url','zone-fig4','prev-fig4')">
+        <span class="upload-icon">🧍</span><div class="spinner-small" style="display:none" id="spin-fig4"></div><img class="preview-img" id="prev-fig4">
+        <span class="upload-label">Produit 4</span><span class="upload-sub">PNG - détourable</span>
+      </div>
+      <div class="upload-zone fig-zone" id="zone-fig5">
+        <input type="file" accept="image/*" onchange="uploadToCloudinary(this,'figure5_url','zone-fig5','prev-fig5')">
+        <span class="upload-icon">🧍</span><div class="spinner-small" style="display:none" id="spin-fig5"></div><img class="preview-img" id="prev-fig5">
+        <span class="upload-label">Produit 5</span><span class="upload-sub">PNG - détourable</span>
+      </div>
+    </div>
+    <div class="product-controls">
+      <div class="product-control" data-product-control="1">
+        <div class="product-control-title">Produit 1</div>
+        <div class="slider-row"><div class="slider-label"><span>Taille</span><span class="val" id="val-product1-size">118%</span></div><input type="range" id="product1-size" min="10" max="400" value="118" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Gauche / Droite</span><span class="val" id="val-product1-x">0px</span></div><input type="range" id="product1-x" min="-260" max="260" value="0" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Haut / Bas</span><span class="val" id="val-product1-y">0px</span></div><input type="range" id="product1-y" min="-180" max="180" value="0" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Rotation</span><span class="val" id="val-product1-rot">0°</span></div><input type="range" id="product1-rot" min="-180" max="180" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Calque</span><span class="val" id="val-product1-z">21</span></div><input type="range" id="product1-z" min="1" max="50" value="21" oninput="onProductSlider(this)"></div>
+      </div>
+      <div class="product-control" data-product-control="2">
+        <div class="product-control-title">Produit 2</div>
+        <div class="slider-row"><div class="slider-label"><span>Taille</span><span class="val" id="val-product2-size">118%</span></div><input type="range" id="product2-size" min="10" max="400" value="118" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Gauche / Droite</span><span class="val" id="val-product2-x">0px</span></div><input type="range" id="product2-x" min="-260" max="260" value="0" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Haut / Bas</span><span class="val" id="val-product2-y">0px</span></div><input type="range" id="product2-y" min="-180" max="180" value="0" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Rotation</span><span class="val" id="val-product2-rot">0°</span></div><input type="range" id="product2-rot" min="-180" max="180" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Calque</span><span class="val" id="val-product2-z">22</span></div><input type="range" id="product2-z" min="1" max="50" value="22" oninput="onProductSlider(this)"></div>
+      </div>
+      <div class="product-control" data-product-control="3">
+        <div class="product-control-title">Produit 3</div>
+        <div class="slider-row"><div class="slider-label"><span>Taille</span><span class="val" id="val-product3-size">118%</span></div><input type="range" id="product3-size" min="10" max="400" value="118" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Gauche / Droite</span><span class="val" id="val-product3-x">0px</span></div><input type="range" id="product3-x" min="-260" max="260" value="0" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Haut / Bas</span><span class="val" id="val-product3-y">0px</span></div><input type="range" id="product3-y" min="-180" max="180" value="0" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Rotation</span><span class="val" id="val-product3-rot">0°</span></div><input type="range" id="product3-rot" min="-180" max="180" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Calque</span><span class="val" id="val-product3-z">23</span></div><input type="range" id="product3-z" min="1" max="50" value="23" oninput="onProductSlider(this)"></div>
+      </div>
+      <div class="product-control" data-product-control="4">
+        <div class="product-control-title">Produit 4</div>
+        <div class="slider-row"><div class="slider-label"><span>Taille</span><span class="val" id="val-product4-size">118%</span></div><input type="range" id="product4-size" min="10" max="400" value="118" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Gauche / Droite</span><span class="val" id="val-product4-x">0px</span></div><input type="range" id="product4-x" min="-260" max="260" value="0" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Haut / Bas</span><span class="val" id="val-product4-y">0px</span></div><input type="range" id="product4-y" min="-180" max="180" value="0" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Rotation</span><span class="val" id="val-product4-rot">0°</span></div><input type="range" id="product4-rot" min="-180" max="180" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Calque</span><span class="val" id="val-product4-z">24</span></div><input type="range" id="product4-z" min="1" max="50" value="24" oninput="onProductSlider(this)"></div>
+      </div>
+      <div class="product-control" data-product-control="5">
+        <div class="product-control-title">Produit 5</div>
+        <div class="slider-row"><div class="slider-label"><span>Taille</span><span class="val" id="val-product5-size">118%</span></div><input type="range" id="product5-size" min="10" max="400" value="118" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Gauche / Droite</span><span class="val" id="val-product5-x">0px</span></div><input type="range" id="product5-x" min="-260" max="260" value="0" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Haut / Bas</span><span class="val" id="val-product5-y">0px</span></div><input type="range" id="product5-y" min="-180" max="180" value="0" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Rotation</span><span class="val" id="val-product5-rot">0°</span></div><input type="range" id="product5-rot" min="-180" max="180" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Calque</span><span class="val" id="val-product5-z">25</span></div><input type="range" id="product5-z" min="1" max="50" value="25" oninput="onProductSlider(this)"></div>
+      </div>
+    </div>
+    <div class="hint">Dans l’aperçu : cliquez un élément pour afficher ses poignées, utilisez Maj + clic pour en sélectionner plusieurs et le cadenas pour bloquer la sélection. Pour les calques, plus le chiffre est haut, plus le produit passe devant.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="num">3</span> Fond optionnel</div>
+    <div class="background-mode">
+      <label class="background-choice">
+        <input type="radio" name="background_mode" value="gradient" checked onchange="updateBackgroundMode()">
+        <span><strong>Dégradé coloré</strong><small>Choisissez deux couleurs pour le fond</small></span>
+      </label>
+      <label class="background-choice">
+        <input type="radio" name="background_mode" value="upload" onchange="updateBackgroundMode()">
+        <span><strong>Importer mon fond</strong><small>JPG ou PNG depuis votre ordinateur</small></span>
+      </label>
+    </div>
+    <div class="background-panel" id="backgroundGradientPanel">
+      <div class="field-row">
+        <div class="field">
+          <label>Couleur principale</label>
+          <input type="color" id="fallback_bg" value="#06233a" oninput="sendToIframe()">
+        </div>
+        <div class="field">
+          <label>Couleur secondaire</label>
+          <input type="color" id="fallback_bg2" value="#2f80c9" oninput="sendToIframe()">
+        </div>
+      </div>
+      <div class="hint">Le dégradé est appliqué automatiquement derrière les produits.</div>
+    </div>
+    <div class="background-panel" id="backgroundUploadPanel" hidden>
+      <div class="upload-zone" id="zone-bg">
+        <input type="file" accept="image/*" onchange="uploadToCloudinary(this,'bg_url','zone-bg','prev-bg')">
+        <span class="upload-icon">🌌</span><div class="spinner-small" style="display:none" id="spin-bg"></div><img class="preview-img" id="prev-bg" style="width:120px;height:58px;object-fit:cover">
+        <span class="upload-label">Fond / Background</span><span class="upload-sub">La photo est utilisée sans filtre coloré</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="showPreview()">👁️ PRÉVISUALISER LES FORMATS</button>
+  <button class="btn" onclick="showLinks()">🔗 CRÉER LES LIENS GOODS</button>
+  <button class="btn btn-hd" id="generateHdBtn" onclick="generateGoodsHD()">🚀 GÉNÉRER LES 3 FORMATS HD</button>
+  <div class="hd-status" id="hdStatus" role="status" aria-live="polite"></div>
+  <div class="hd-downloads" id="hdDownloads"></div>
+  <div class="video-export-panel">
+    <div class="video-export-title">Formats vidéo à exporter</div>
+    <div class="video-format-options">
+      <label class="video-format-choice"><input type="checkbox" data-video-format value="desktop"><span><strong>Web banner</strong><small>1562 × 395 — 5 s</small></span></label>
+      <label class="video-format-choice"><input type="checkbox" data-video-format value="mobile"><span><strong>Mobile banner</strong><small>700 × 420 — 5 s</small></span></label>
+      <label class="video-format-choice"><input type="checkbox" data-video-format value="social"><span><strong>Story / Insta</strong><small>1080 × 1920 — 5 s</small></span></label>
+      <label class="video-format-choice"><input type="checkbox" data-video-format value="video" checked><span><strong>Vertical dynamique</strong><small>1080 × 1920 — 5 s</small></span></label>
+    </div>
+    <div class="video-export-note">Cochez un ou plusieurs formats. Web, Mobile et Story reprennent la lévitation réglée dans « Animation HTML ». À la fin, un ZIP contenant tous les MP4 est automatiquement envoyé dans vos téléchargements.</div>
+  </div>
+  <button class="btn btn-video" id="generateVideoBtn" onclick="generateGoodsVideo()">🎬 EXPORTER ET TÉLÉCHARGER LE ZIP</button>
+  <div class="hd-status" id="videoStatus" role="status" aria-live="polite"></div>
+
+  <div class="editor-layout" id="editorLayout">
+  <div class="preview-card" id="previewCard">
+    <div class="tabs">
+      <button class="tab active" onclick="switchGoodsTab('desktop',this)">Web</button>
+      <button class="tab" onclick="switchGoodsTab('mobile',this)">Mobile</button>
+      <button class="tab" onclick="switchGoodsTab('social',this)">Story / Insta</button>
+      <button class="tab" onclick="switchGoodsTab('video',this)">Vidéo 5s</button>
+    </div>
+    <div class="preview-wrap"><iframe id="goodsIframe" scrolling="no" onload="window.wirePreviewInteraction && window.wirePreviewInteraction()"></iframe></div>
+  </div>
+
+  <div class="card control-dock" id="controlDock">
+    <div class="card-title"><span class="num">⚙</span> Réglages <span id="controlsFormatLabel">Goods Web</span></div>
+    <div id="productControlsMount"></div>
+    <div class="text-toolbar" id="textToolbar">
+      <button type="button" class="add-text-btn" onclick="addGoodsText()">＋ Ajouter un texte</button>
+      <span>Ajoutez jusqu’à 8 textes, puis déplacez-les et modifiez-les directement dans l’aperçu.</span>
+    </div>
+    <div class="product-control" id="bannerTextControls" style="margin-top:18px;display:none">
+      <div class="product-control-title" id="bannerTextControlsTitle">Texte Web</div>
+      <label class="toggle-pill" style="margin-bottom:12px"><input type="checkbox" id="banner-text-visible" checked onchange="setBannerTextVisibility(this.checked)"> Afficher le texte</label>
+      <div class="field-row">
+        <div class="slider-row">
+          <div class="slider-label"><span>Couleur</span></div>
+          <input type="color" id="banner-text-color" value="#ffffff" oninput="onElementSlider(this)">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>Taille du texte</span><span class="val" id="val-banner-text-size">100%</span></div>
+          <input type="range" id="banner-text-size" min="20" max="400" value="100" oninput="onElementSlider(this)">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>Gauche / Droite</span><span class="val" id="val-banner-text-x">0px</span></div>
+          <input type="range" id="banner-text-x" min="-700" max="700" value="0" oninput="onElementSlider(this)">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>Monter / Descendre</span><span class="val" id="val-banner-text-y">0px</span></div>
+          <input type="range" id="banner-text-y" min="-400" max="400" value="0" oninput="onElementSlider(this)">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>Rotation du texte</span><span class="val" id="val-banner-text-rot">0°</span></div>
+          <input type="range" id="banner-text-rot" min="-180" max="180" value="0" oninput="onElementSlider(this)">
+        </div>
+      </div>
+      <div class="hint">Cliquez le texte sur le visuel pour l’éditer, le déplacer, le tourner, l’agrandir, le supprimer ou le verrouiller avec le cadenas.</div>
+    </div>
+    <div class="product-control" id="storyTextControls" style="margin-top:18px;display:none">
+      <div class="product-control-title">Texte Story / Instagram</div>
+      <div class="field-row">
+        <div class="slider-row">
+          <div class="slider-label"><span>Taille du texte</span><span class="val" id="val-story-text-size">100%</span></div>
+          <input type="range" id="story-text-size" min="20" max="400" value="100" oninput="onElementSlider(this)">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>Gauche / Droite</span><span class="val" id="val-story-text-x">0px</span></div>
+          <input type="range" id="story-text-x" min="-500" max="500" value="0" oninput="onElementSlider(this)">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>Monter / Descendre le texte</span><span class="val" id="val-story-text-y">0px</span></div>
+          <input type="range" id="story-text-y" min="-500" max="500" value="0" oninput="onElementSlider(this)">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>Rotation du texte</span><span class="val" id="val-story-text-rot">0°</span></div>
+          <input type="range" id="story-text-rot" min="-180" max="180" value="0" oninput="onElementSlider(this)">
+        </div>
+      </div>
+      <div class="hint">Astuce : glissez le texte directement dans l’aperçu. Cliquez dedans pour l’éditer et appuyez sur Entrée pour passer à la ligne.</div>
+    </div>
+    <div class="product-control" id="videoTextControls" style="margin-top:18px;display:none">
+      <div class="product-control-title">Réglages Vidéo 5s</div>
+      <div class="field-row">
+        <div class="slider-row">
+          <div class="slider-label"><span>Vitesse du défilement</span><span class="val" id="val-video-speed">100%</span></div>
+          <input type="range" id="video-speed" min="50" max="160" value="100" oninput="onElementSlider(this)">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>Taille du texte</span><span class="val" id="val-video-text-size">100%</span></div>
+          <input type="range" id="video-text-size" min="20" max="400" value="100" oninput="onElementSlider(this)">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>Gauche / Droite le texte</span><span class="val" id="val-video-text-x">0px</span></div>
+          <input type="range" id="video-text-x" min="-500" max="500" value="0" oninput="onElementSlider(this)">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>Monter / Descendre le texte</span><span class="val" id="val-video-text-y">0px</span></div>
+          <input type="range" id="video-text-y" min="-300" max="300" value="0" oninput="onElementSlider(this)">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>Rotation du texte</span><span class="val" id="val-video-text-rot">0°</span></div>
+          <input type="range" id="video-text-rot" min="-180" max="180" value="0" oninput="onElementSlider(this)">
+        </div>
+      </div>
+      <div class="hint">Astuce : glissez le texte directement dans l’aperçu. Cliquez dedans pour l’éditer et appuyez sur Entrée pour passer à la ligne.</div>
+    </div>
+    <div class="product-control" id="animationControls" style="margin-top:18px">
+      <div class="product-control-title">✨ Animation HTML</div>
+      <div class="field-row" style="grid-template-columns:160px 1fr 1fr;align-items:end">
+        <label class="toggle-row"><input type="checkbox" id="animation-enabled" checked onchange="onGoodsAnimationControl()"> Activer</label>
+        <div class="slider-row">
+          <div class="slider-label"><span>Intensité</span><span class="val" id="val-animation-intensity">45%</span></div>
+          <input type="range" id="animation-intensity" min="0" max="100" value="45" oninput="onGoodsAnimationControl()">
+        </div>
+        <div class="slider-row">
+          <div class="slider-label"><span>Vitesse</span><span class="val" id="val-animation-speed">60%</span></div>
+          <input type="range" id="animation-speed" min="10" max="100" value="60" oninput="onGoodsAnimationControl()">
+        </div>
+      </div>
+    </div>
+    <button type="button" class="reset-format-btn" onclick="resetElementControls()">↻ Réinitialiser ce format</button>
+  </div>
+  </div>
+
+  <div class="links" id="linksBox"></div>
+</div>
+
+<script src="access-key.js"></script>
+<script>
+const CLOUD_NAME = "dyvmftiyu";
+const UPLOAD_PRESET = "banner_generator";
+const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/62irmz92j6x8l6a4d1v9mnpxfbtmlwmu";
+// Doppio s'exécute sur un serveur distant et ne peut jamais ouvrir une URL
+// locale file://. Les pages de rendu utilisent donc toujours leur adresse
+// publique, même lorsque le formulaire est testé depuis le Mac.
+const BASE_URL = 'https://magicstudioapp.github.io/magic-studio';
+const MAX_PRODUCTS = 20;
+const MAX_LOGOS = 5;
+const MAX_EXTRA_TEXTS = 8;
+const EDITOR_MARGIN = 140;
+const urls = {};
+let currentGoodsTab = 'desktop';
+const goodsConfig = {
+  desktop:{w:1562,h:395,scale:.54,tpl:'goods-desktop.html',label:'Goods Web'},
+  mobile:{w:700,h:420,scale:.86,tpl:'goods-mobile.html',label:'Goods Mobile'},
+  social:{w:1080,h:1920,scale:.32,tpl:'goods-social.html',label:'Goods Story / Insta'},
+  video:{w:1080,h:1920,scale:.32,tpl:'goods-video.html',label:'Goods Vidéo 5s'}
+};
+const defaultFormatControls = {};
+
+function extendProductFields() {
+  const uploadGrid = document.querySelector('.product-upload-grid');
+  const controlsGrid = document.querySelector('.product-controls:not(.logo-controls)');
+  for (let i = 6; i <= MAX_PRODUCTS; i++) {
+    uploadGrid.insertAdjacentHTML('beforeend', `
+      <div class="upload-zone fig-zone" id="zone-fig${i}">
+        <input type="file" accept="image/*" onchange="uploadToCloudinary(this,'figure${i}_url','zone-fig${i}','prev-fig${i}')">
+        <span class="upload-icon">🧍</span><div class="spinner-small" style="display:none" id="spin-fig${i}"></div><img class="preview-img" id="prev-fig${i}">
+        <span class="upload-label">Produit ${i}</span><span class="upload-sub">PNG - détourable</span>
+      </div>`);
+    controlsGrid.insertAdjacentHTML('beforeend', `
+      <div class="product-control" data-product-control="${i}">
+        <div class="product-control-title">Produit ${i}</div>
+        <div class="slider-row"><div class="slider-label"><span>Taille</span><span class="val" id="val-product${i}-size">118%</span></div><input type="range" id="product${i}-size" min="10" max="400" value="118" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Gauche / Droite</span><span class="val" id="val-product${i}-x">0px</span></div><input type="range" id="product${i}-x" min="-260" max="260" value="0" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Haut / Bas</span><span class="val" id="val-product${i}-y">0px</span></div><input type="range" id="product${i}-y" min="-180" max="180" value="0" oninput="onProductSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Rotation</span><span class="val" id="val-product${i}-rot">0°</span></div><input type="range" id="product${i}-rot" min="-180" max="180" value="0" oninput="onElementSlider(this)"></div>
+        <div class="slider-row"><div class="slider-label"><span>Calque</span><span class="val" id="val-product${i}-z">${20 + i}</span></div><input type="range" id="product${i}-z" min="1" max="50" value="${20 + i}" oninput="onProductSlider(this)"></div>
+      </div>`);
+  }
+}
+extendProductFields();
+document.querySelectorAll('.logo-controls .product-control').forEach((control, index) => {
+  control.dataset.logoControl = String(index + 1);
+});
+
+for (let i = 1; i <= MAX_LOGOS; i++) {
+  defaultFormatControls['left' + i + '_size'] = '100';
+  defaultFormatControls['left' + i + '_x'] = '0';
+  defaultFormatControls['left' + i + '_y'] = '0';
+  defaultFormatControls['left' + i + '_rot'] = '0';
+}
+for (let i = 1; i <= MAX_PRODUCTS; i++) {
+  defaultFormatControls['product' + i + '_size'] = '118';
+  defaultFormatControls['product' + i + '_x'] = '0';
+  defaultFormatControls['product' + i + '_y'] = '0';
+  defaultFormatControls['product' + i + '_rot'] = '0';
+  defaultFormatControls['product' + i + '_z'] = String(20 + i);
+}
+defaultFormatControls.video_speed = '100';
+defaultFormatControls.video_text_size = '100';
+defaultFormatControls.video_text_x = '0';
+defaultFormatControls.video_text_y = '0';
+defaultFormatControls.video_text_rot = '0';
+defaultFormatControls.story_text_size = '100';
+defaultFormatControls.story_text_x = '0';
+defaultFormatControls.story_text_y = '0';
+defaultFormatControls.story_text_rot = '0';
+defaultFormatControls.banner_text_size = '100';
+defaultFormatControls.banner_text_x = '0';
+defaultFormatControls.banner_text_y = '0';
+defaultFormatControls.banner_text_rot = '0';
+defaultFormatControls.banner_text_color = '#ffffff';
+const formatControls = {};
+const extraTexts = {};
+const primaryTextVisible = {};
+const lockedItems = {};
+Object.keys(goodsConfig).forEach(kind => {
+  formatControls[kind] = {...defaultFormatControls};
+  extraTexts[kind] = [];
+  primaryTextVisible[kind] = true;
+  lockedItems[kind] = new Set();
+});
+
+function getParams(kind = currentGoodsTab) {
+  if (kind === currentGoodsTab) saveControlsForFormat(kind);
+  const backgroundMode = document.querySelector('input[name="background_mode"]:checked')?.value || 'gradient';
+  const animationEnabled = document.getElementById('animation-enabled').checked ? '1' : '0';
+  const params = {
+    template_type:'goods',
+    background_mode:backgroundMode,
+    background_prompt:'',
+    background_reference_url:urls.figure1_url || '',
+    figure_count:document.getElementById('figure_count').value,
+    fallback_bg:document.getElementById('fallback_bg').value,
+    fallback_bg2:document.getElementById('fallback_bg2').value,
+    bg_url:backgroundMode === 'upload' ? (urls.bg_url || '') : '',
+    product_glow:document.getElementById('product_glow_enabled').checked ? document.getElementById('product_glow').value : 'transparent',
+    banner_text:document.getElementById('banner_text').value,
+    series_text:document.getElementById('series_text').value,
+    series_text_color:document.getElementById('series_text_color').value,
+    show_text:primaryTextVisible[kind] ? '1' : '0',
+    extra_texts:JSON.stringify(extraTexts[kind]),
+    animation:kind === 'video' ? '0' : animationEnabled,
+    animIntensity:document.getElementById('animation-intensity').value,
+    animSpeed:document.getElementById('animation-speed').value,
+    ...formatControls[kind]
+  };
+  for (let i = 1; i <= MAX_LOGOS; i++) {
+    params['left' + i + '_url'] = urls['left' + i + '_url'] || '';
+    params['show_left' + i] = document.getElementById('show_left' + i).checked ? '1' : '0';
+  }
+  for (let i = 1; i <= MAX_PRODUCTS; i++) params['figure' + i + '_url'] = urls['figure' + i + '_url'] || '';
+  return params;
+}
+
+function onGoodsAnimationControl() {
+  document.getElementById('val-animation-intensity').textContent = document.getElementById('animation-intensity').value + '%';
+  document.getElementById('val-animation-speed').textContent = document.getElementById('animation-speed').value + '%';
+  sendToIframe();
+}
+
+function saveControlsForFormat(kind = currentGoodsTab) {
+  const controls = formatControls[kind];
+  for (let i = 1; i <= MAX_LOGOS; i++) {
+    ['size', 'x', 'y', 'rot'].forEach(prop => {
+      const el = document.getElementById('left' + i + '-' + prop);
+      if (el) controls['left' + i + '_' + prop] = el.value;
+    });
+  }
+  for (let i = 1; i <= MAX_PRODUCTS; i++) {
+    ['size', 'x', 'y', 'rot', 'z'].forEach(prop => {
+      const el = document.getElementById('product' + i + '-' + prop);
+      if (el) controls['product' + i + '_' + prop] = el.value;
+    });
+  }
+  controls.video_speed = document.getElementById('video-speed').value;
+  controls.video_text_size = document.getElementById('video-text-size').value;
+  controls.video_text_x = document.getElementById('video-text-x').value;
+  controls.video_text_y = document.getElementById('video-text-y').value;
+  controls.video_text_rot = document.getElementById('video-text-rot').value;
+  controls.story_text_size = document.getElementById('story-text-size').value;
+  controls.story_text_x = document.getElementById('story-text-x').value;
+  controls.story_text_y = document.getElementById('story-text-y').value;
+  controls.story_text_rot = document.getElementById('story-text-rot').value;
+  controls.banner_text_size = document.getElementById('banner-text-size').value;
+  controls.banner_text_x = document.getElementById('banner-text-x').value;
+  controls.banner_text_y = document.getElementById('banner-text-y').value;
+  controls.banner_text_rot = document.getElementById('banner-text-rot').value;
+  controls.banner_text_color = document.getElementById('banner-text-color').value;
+}
+
+function loadControlsForFormat(kind) {
+  updateMovementRanges(kind);
+  const controls = formatControls[kind];
+  Object.entries(controls).forEach(([key, value]) => {
+    const id = key.replace(/_/g, '-');
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = value;
+    const unit = (id.endsWith('-size') || id === 'video-speed') ? '%' : (id.endsWith('-rot') ? '°' : (id.endsWith('-z') ? '' : 'px'));
+    const val = document.getElementById('val-' + id);
+    if (val) val.textContent = value + unit;
+  });
+  document.getElementById('controlsFormatLabel').textContent = goodsConfig[kind].label;
+  const isBanner = kind === 'desktop' || kind === 'mobile';
+  document.getElementById('bannerTextControls').style.display = isBanner ? 'block' : 'none';
+  document.getElementById('bannerTextControlsTitle').textContent = kind === 'mobile' ? 'Texte Mobile' : 'Texte Web';
+  document.getElementById('banner-text-visible').checked = primaryTextVisible[kind];
+  document.getElementById('storyTextControls').style.display = kind === 'social' ? 'block' : 'none';
+  document.getElementById('videoTextControls').style.display = kind === 'video' ? 'block' : 'none';
+  document.getElementById('textToolbar').classList.toggle('show', kind === 'social' || kind === 'video');
+  document.getElementById('animationControls').style.display = kind === 'video' ? 'none' : 'block';
+}
+
+function setBannerTextVisibility(visible) {
+  primaryTextVisible[currentGoodsTab] = Boolean(visible);
+  sendToIframe();
+}
+
+function addGoodsText() {
+  if (currentGoodsTab !== 'social' && currentGoodsTab !== 'video') return;
+  if (!primaryTextVisible[currentGoodsTab]) {
+    primaryTextVisible[currentGoodsTab] = true;
+    sendToIframe();
+    return;
+  }
+  if (extraTexts[currentGoodsTab].length >= MAX_EXTRA_TEXTS) {
+    alert('Vous pouvez ajouter jusqu’à ' + MAX_EXTRA_TEXTS + ' textes supplémentaires.');
+    return;
+  }
+  const index = extraTexts[currentGoodsTab].length;
+  extraTexts[currentGoodsTab].push({
+    id:'extra-' + Date.now().toString(36) + '-' + index,
+    text:'Nouveau texte',
+    size:100,
+    x:0,
+    y:(index - 1) * 150,
+    rot:0,
+    color:document.getElementById('series_text_color').value
+  });
+  sendToIframe();
+}
+
+function updateMovementRanges(kind) {
+  const cfg = goodsConfig[kind];
+  if (!cfg) return;
+  const horizontalLimit = cfg.w;
+  const verticalLimit = cfg.h;
+  const movementControls = [];
+  for (let i = 1; i <= MAX_LOGOS; i++) {
+    movementControls.push(document.getElementById('left' + i + '-x'));
+    movementControls.push(document.getElementById('left' + i + '-y'));
+  }
+  for (let i = 1; i <= MAX_PRODUCTS; i++) {
+    movementControls.push(document.getElementById('product' + i + '-x'));
+    movementControls.push(document.getElementById('product' + i + '-y'));
+  }
+  movementControls.push(document.getElementById('story-text-x'));
+  movementControls.push(document.getElementById('story-text-y'));
+  movementControls.push(document.getElementById('video-text-x'));
+  movementControls.push(document.getElementById('video-text-y'));
+  movementControls.push(document.getElementById('banner-text-x'));
+  movementControls.push(document.getElementById('banner-text-y'));
+  movementControls.filter(Boolean).forEach(control => {
+    const limit = control.id.endsWith('-x') ? horizontalLimit : verticalLimit;
+    control.min = String(-limit);
+    control.max = String(limit);
+  });
+}
+
+function buildUrl(kind, preview = false) {
+  const cfg = goodsConfig[kind];
+  const base = preview ? new URL(cfg.tpl, window.location.href).href : BASE_URL + '/' + cfg.tpl;
+  return base + '?' + new URLSearchParams(getParams(kind)).toString();
+}
+
+async function uploadToCloudinary(input, key, zoneId, prevId) {
+  const file = input.files[0]; if (!file) return;
+  const zone = document.getElementById(zoneId);
+  const prev = document.getElementById(prevId);
+  const spin = document.getElementById('spin-' + zoneId.replace('zone-',''));
+  const label = zone.querySelector('.upload-label');
+  let qualityHint = zone.querySelector('.quality-hint');
+  if (!qualityHint) {
+    qualityHint = document.createElement('span');
+    qualityHint.className = 'quality-hint';
+    zone.appendChild(qualityHint);
+  }
+  zone.classList.add('uploading'); zone.classList.remove('has-file','error');
+  if (spin) spin.style.display = 'block';
+  label.textContent = 'Upload...';
+  try {
+    const dimensions = await readImageDimensions(file);
+    const minimumLongEdge = key === 'bg_url' ? 1920 : (key.startsWith('figure') ? 1400 : 700);
+    const longEdge = Math.max(dimensions.width, dimensions.height);
+    const isSmall = longEdge < minimumLongEdge;
+    qualityHint.classList.toggle('warn', isSmall);
+    qualityHint.textContent = dimensions.width + ' × ' + dimensions.height + ' px' +
+      (isSmall ? ' — risque de flou en HD' : ' — qualité adaptée');
+
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', UPLOAD_PRESET);
+    const res = await fetch('https://api.cloudinary.com/v1_1/' + CLOUD_NAME + '/image/upload', {method:'POST', body:fd});
+    const data = await res.json();
+    if (!data.secure_url) throw new Error(data.error?.message || 'Upload failed');
+    urls[key] = data.secure_url;
+    zone.classList.remove('uploading');
+    zone.classList.add('has-file');
+    if (spin) spin.style.display = 'none';
+    if (prev) prev.src = data.secure_url;
+    label.textContent = file.name.length > 18 ? file.name.substring(0,16) + '...' : file.name;
+    sendToIframe();
+  } catch(err) {
+    zone.classList.remove('uploading');
+    zone.classList.add('error');
+    if (spin) spin.style.display = 'none';
+    label.textContent = 'Erreur';
+    qualityHint.classList.add('warn');
+    qualityHint.textContent = 'Impossible de vérifier ou charger cette image';
+  }
+}
+
+async function uploadProductsBulk(input) {
+  const files = Array.from(input.files || []).slice(0, MAX_PRODUCTS);
+  if (!files.length) return;
+  const status = document.getElementById('bulkUploadStatus');
+  const countSelect = document.getElementById('figure_count');
+  input.disabled = true;
+  countSelect.value = String(files.length);
+  updateFigureVisibility();
+  status.textContent = 'Import de ' + files.length + ' produit' + (files.length > 1 ? 's' : '') + '…';
+  let completed = 0;
+  await Promise.all(files.map(async (file, index) => {
+    const productNumber = index + 1;
+    await uploadToCloudinary(
+      {files:[file]},
+      'figure' + productNumber + '_url',
+      'zone-fig' + productNumber,
+      'prev-fig' + productNumber
+    );
+    completed++;
+    status.textContent = completed + ' / ' + files.length + ' produits traités…';
+  }));
+  input.disabled = false;
+  input.value = '';
+  const failed = files.filter((_, index) => document.getElementById('zone-fig' + (index + 1)).classList.contains('error')).length;
+  status.textContent = failed
+    ? (files.length - failed) + ' produits importés, ' + failed + ' en erreur.'
+    : files.length + ' produits importés avec succès.';
+  sendToIframe();
+}
+
+function readImageDimensions(file) {
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      const dimensions = {width:image.naturalWidth, height:image.naturalHeight};
+      URL.revokeObjectURL(objectUrl);
+      resolve(dimensions);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error('Image illisible'));
+    };
+    image.src = objectUrl;
+  });
+}
+
+function updateFigureVisibility() {
+  const count = Number(document.getElementById('figure_count').value);
+  for (let i=1; i<=MAX_PRODUCTS; i++) {
+    const zone = document.getElementById('zone-fig' + i);
+    if (zone) zone.style.opacity = i <= count ? '1' : '.35';
+    const control = document.querySelector('[data-product-control="' + i + '"]');
+    if (control) control.style.opacity = i <= count ? '1' : '.35';
+  }
+}
+
+function onProductSlider(el) {
+  const unit = el.id.endsWith('-size') ? '%' : (el.id.endsWith('-z') ? '' : 'px');
+  const val = document.getElementById('val-' + el.id);
+  if (val) val.textContent = el.value + unit;
+  saveControlsForFormat();
+  sendToIframe();
+}
+
+function onElementSlider(el) {
+  const unit = (el.id.endsWith('-size') || el.id === 'video-speed') ? '%' : (el.id.endsWith('-rot') ? '°' : 'px');
+  const val = document.getElementById('val-' + el.id);
+  if (val) val.textContent = el.value + unit;
+  saveControlsForFormat();
+  sendToIframe();
+}
+
+function toggleProductGlow() {
+  const enabled = document.getElementById('product_glow_enabled').checked;
+  document.getElementById('product_glow').disabled = !enabled;
+  sendToIframe();
+}
+
+function showPreview() {
+  setupControlsDock();
+  document.getElementById('previewCard').classList.add('show');
+  document.getElementById('controlDock').style.display = 'block';
+  switchGoodsTab(currentGoodsTab, document.querySelector('.tab.active'));
+}
+
+function setupControlsDock() {
+  const mount = document.getElementById('productControlsMount');
+  const controls = document.querySelector('.product-controls:not(.logo-controls)');
+  const logoControls = document.querySelector('.logo-controls');
+  const hint = document.querySelector('.hint');
+  if (mount && controls && !mount.contains(controls)) mount.appendChild(controls);
+  if (mount && logoControls && !mount.contains(logoControls)) mount.appendChild(logoControls);
+  if (mount && hint && !mount.contains(hint)) mount.appendChild(hint);
+}
+
+function resetElementControls() {
+  formatControls[currentGoodsTab] = {...defaultFormatControls};
+  extraTexts[currentGoodsTab] = [];
+  primaryTextVisible[currentGoodsTab] = true;
+  lockedItems[currentGoodsTab].clear();
+  loadControlsForFormat(currentGoodsTab);
+  sendToIframe();
+}
+
+function switchGoodsTab(kind, tabEl) {
+  saveControlsForFormat(currentGoodsTab);
+  currentGoodsTab = kind;
+  loadControlsForFormat(kind);
+  document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+  if (tabEl) tabEl.classList.add('active');
+  const cfg = goodsConfig[kind];
+  const iframe = document.getElementById('goodsIframe');
+  const previewWrap = document.querySelector('.preview-wrap');
+  const vertical = kind === 'social' || kind === 'video';
+  document.getElementById('editorLayout').classList.toggle('vertical', vertical);
+  document.body.classList.toggle('vertical-editor', vertical);
+  const editorWidth = cfg.w + EDITOR_MARGIN * 2;
+  const editorHeight = cfg.h + EDITOR_MARGIN * 2;
+  const editorScale = Math.min(cfg.scale, 900 / editorWidth);
+  previewWrap.style.height = (editorHeight * editorScale) + 'px';
+  previewWrap.style.borderRadius = vertical ? '0' : '12px';
+  iframe.style.transform = 'scale(' + editorScale + ')';
+  iframe.style.width = editorWidth + 'px';
+  iframe.style.height = editorHeight + 'px';
+  iframe.src = buildUrl(kind, true);
+}
+
+function sendToIframe() {
+  const card = document.getElementById('previewCard');
+  if (!card.classList.contains('show')) return;
+  const iframe = document.getElementById('goodsIframe');
+  iframe.src = buildUrl(currentGoodsTab, true);
+}
+
+function setGoodsDragControl(id, value) {
+  const control = document.getElementById(id);
+  if (!control) return;
+  const bounded = Math.max(Number(control.min), Math.min(Number(control.max), Math.round(value)));
+  control.value = bounded;
+  const val = document.getElementById('val-' + id);
+  if (val) val.textContent = bounded + 'px';
+  return bounded;
+}
+
+function applyGoodsDragPreview(el, type, index, x, y) {
+  if (type === 'left') {
+    const size = Number(formatControls[currentGoodsTab]['left' + index + '_size'] || 100) / 100;
+    const rot = Number(formatControls[currentGoodsTab]['left' + index + '_rot'] || 0);
+    if (currentGoodsTab === 'video') {
+      el.style.setProperty('--user-x', x + 'px');
+      el.style.setProperty('--user-y', y + 'px');
+    } else if (index === 1) {
+      const perspective = currentGoodsTab === 'social' ? 420 : (currentGoodsTab === 'mobile' ? 260 : 360);
+      const rotateY = currentGoodsTab === 'mobile' ? -14 : -16;
+      const baseRot = currentGoodsTab === 'mobile' ? -5 : -6;
+      el.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + size + ') perspective(' + perspective + 'px) rotateY(' + rotateY + 'deg) rotateZ(' + (baseRot + rot) + 'deg)';
+    } else {
+      el.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + size + ') rotate(' + rot + 'deg)';
+    }
+    return;
+  }
+  const size = Number(formatControls[currentGoodsTab]['product' + index + '_size'] || 118) / 100;
+  const rot = Number(formatControls[currentGoodsTab]['product' + index + '_rot'] || 0);
+  if (currentGoodsTab === 'video') {
+    el.style.setProperty('--item-x', x + 'px');
+    el.style.setProperty('--item-y', y + 'px');
+  } else {
+    el.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + size + ') rotate(' + rot + 'deg)';
+  }
+  el.ownerDocument.__refreshGoodsSelection?.();
+}
+
+function deleteGoodsProduct(index, refresh = true) {
+  const countSelect = document.getElementById('figure_count');
+  const count = Number(countSelect.value);
+  for (let i = index; i < count; i++) {
+    urls['figure' + i + '_url'] = urls['figure' + (i + 1) + '_url'] || '';
+    Object.keys(formatControls).forEach(kind => {
+      ['size', 'x', 'y', 'rot', 'z'].forEach(prop => {
+        formatControls[kind]['product' + i + '_' + prop] = formatControls[kind]['product' + (i + 1) + '_' + prop];
+      });
+    });
+  }
+  delete urls['figure' + count + '_url'];
+  Object.keys(formatControls).forEach(kind => {
+    ['size', 'x', 'y', 'rot', 'z'].forEach(prop => {
+      formatControls[kind]['product' + count + '_' + prop] = defaultFormatControls['product' + count + '_' + prop];
+    });
+  });
+  if (count > 1) countSelect.value = String(count - 1);
+  for (let i = 1; i <= MAX_PRODUCTS; i++) {
+    const zone = document.getElementById('zone-fig' + i);
+    const preview = document.getElementById('prev-fig' + i);
+    const label = zone?.querySelector('.upload-label');
+    const url = urls['figure' + i + '_url'];
+    zone?.classList.toggle('has-file', Boolean(url));
+    zone?.classList.remove('error', 'uploading');
+    if (preview) {
+      if (url) preview.src = url;
+      else preview.removeAttribute('src');
+    }
+    if (label) label.textContent = url ? 'Produit ' + i + ' chargé' : 'Produit ' + i;
+  }
+  updateFigureVisibility();
+  if (refresh) {
+    loadControlsForFormat(currentGoodsTab);
+    sendToIframe();
+  }
+}
+
+function deleteGoodsLogo(index, refresh = true) {
+  delete urls['left' + index + '_url'];
+  const zone = document.getElementById('zone-left' + index);
+  const preview = document.getElementById('prev-left' + index);
+  const label = zone?.querySelector('.upload-label');
+  zone?.classList.remove('has-file', 'error', 'uploading');
+  preview?.removeAttribute('src');
+  if (label) label.textContent = 'Image gauche ' + index;
+  if (refresh) sendToIframe();
+}
+
+function getExtraText(item) {
+  return extraTexts[currentGoodsTab].find(text => text.id === item.index);
+}
+
+function getGoodsItemPrefix(item) {
+  if (item.type === 'product') return 'product' + item.index;
+  if (item.type === 'left') return 'left' + item.index;
+  if (item.type === 'primary-text') {
+    if (currentGoodsTab === 'desktop' || currentGoodsTab === 'mobile') return 'banner_text';
+    return (currentGoodsTab === 'social' ? 'story' : 'video') + '_text';
+  }
+  return '';
+}
+
+function getGoodsItemValues(item) {
+  if (item.type === 'extra-text') {
+    const text = getExtraText(item) || {};
+    return {size:Number(text.size || 100), x:Number(text.x || 0), y:Number(text.y || 0), rot:Number(text.rot || 0)};
+  }
+  const prefix = getGoodsItemPrefix(item);
+  const fallbackSize = item.type === 'product' ? 118 : 100;
+  return {
+    size:Number(formatControls[currentGoodsTab][prefix + '_size'] || fallbackSize),
+    x:Number(formatControls[currentGoodsTab][prefix + '_x'] || 0),
+    y:Number(formatControls[currentGoodsTab][prefix + '_y'] || 0),
+    rot:Number(formatControls[currentGoodsTab][prefix + '_rot'] || 0)
+  };
+}
+
+function setGoodsItemValue(item, prop, value) {
+  value = Math.round(Number(value) || 0);
+  if (prop === 'size') value = Math.max(item.type.includes('text') ? 20 : 10, Math.min(400, value));
+  if (prop === 'rot') value = ((value + 180) % 360 + 360) % 360 - 180;
+  if (prop === 'x') value = Math.max(-goodsConfig[currentGoodsTab].w, Math.min(goodsConfig[currentGoodsTab].w, value));
+  if (prop === 'y') value = Math.max(-goodsConfig[currentGoodsTab].h, Math.min(goodsConfig[currentGoodsTab].h, value));
+  if (item.type === 'extra-text') {
+    const text = getExtraText(item);
+    if (text) text[prop] = value;
+    return value;
+  }
+  const prefix = getGoodsItemPrefix(item);
+  formatControls[currentGoodsTab][prefix + '_' + prop] = String(value);
+  const id = (prefix + '-' + prop).replace(/_/g, '-');
+  const control = document.getElementById(id);
+  if (control) control.value = String(value);
+  const label = document.getElementById('val-' + id);
+  if (label) label.textContent = value + (prop === 'size' ? '%' : (prop === 'rot' ? '°' : 'px'));
+  return value;
+}
+
+function applyGoodsItemPreview(item) {
+  const values = getGoodsItemValues(item);
+  if (item.type === 'left' || item.type === 'product') {
+    applyGoodsDragPreview(item.el, item.type, item.index, values.x, values.y);
+    return;
+  }
+  if (item.type === 'primary-text') {
+    const textLayout = {
+      desktop:{fontSize:52, bottom:48},
+      mobile:{fontSize:38, bottom:36},
+      social:{fontSize:82, bottom:110},
+      video:{fontSize:82, bottom:300}
+    }[currentGoodsTab];
+    item.el.style.fontSize = (textLayout.fontSize * values.size / 100) + 'px';
+    item.el.style.bottom = (textLayout.bottom - values.y) + 'px';
+    if (currentGoodsTab === 'video') {
+      item.el.style.setProperty('--text-x', values.x + 'px');
+      item.el.style.setProperty('--text-rot', values.rot + 'deg');
+    } else {
+      item.el.style.transform = 'translateX(' + values.x + 'px) rotate(' + values.rot + 'deg)';
+    }
+    return;
+  }
+  item.el.style.transform = 'translate(-50%,-50%) translate(' + values.x + 'px,' + values.y + 'px) scale(' + (values.size / 100) + ') rotate(' + values.rot + 'deg)';
+}
+
+function deleteGoodsItems(items) {
+  const unlocked = items.filter(item => !lockedItems[currentGoodsTab].has(item.key));
+  const products = unlocked.filter(item => item.type === 'product').map(item => Number(item.index)).sort((a, b) => b - a);
+  unlocked.filter(item => item.type === 'left').forEach(item => deleteGoodsLogo(item.index, false));
+  unlocked.filter(item => item.type === 'extra-text').forEach(item => {
+    extraTexts[currentGoodsTab] = extraTexts[currentGoodsTab].filter(text => text.id !== item.index);
+  });
+  if (unlocked.some(item => item.type === 'primary-text')) {
+    primaryTextVisible[currentGoodsTab] = false;
+    if (currentGoodsTab === 'desktop' || currentGoodsTab === 'mobile') document.getElementById('banner-text-visible').checked = false;
+  }
+  products.forEach(index => deleteGoodsProduct(index, false));
+  if (products.length) lockedItems[currentGoodsTab].clear();
+  loadControlsForFormat(currentGoodsTab);
+  sendToIframe();
+}
+
+function installGoodsEditor(doc) {
+  const cfg = goodsConfig[currentGoodsTab];
+  const style = doc.createElement('style');
+  style.textContent = `
+    html,body{width:${cfg.w + EDITOR_MARGIN * 2}px!important;height:${cfg.h + EDITOR_MARGIN * 2}px!important;overflow:visible!important;background:transparent!important}
+    .banner{transform:translate(${EDITOR_MARGIN}px,${EDITOR_MARGIN}px);transform-origin:top left}
+    [data-goods-editor-key]{touch-action:none}
+    .goods-item-selected{outline:3px solid #fbbf24!important;outline-offset:6px}
+    .goods-item-locked{cursor:not-allowed!important}
+    .goods-selection{position:absolute;border:3px dashed #a855f7;box-shadow:0 0 0 1px rgba(255,255,255,.8);z-index:9999;pointer-events:none}
+    .goods-selection.locked{border-color:#fbbf24}
+    .goods-handle{position:absolute;width:44px;height:44px;border:3px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#7c3aed;color:white;font:700 22px Arial;box-shadow:0 4px 14px rgba(0,0,0,.55);pointer-events:auto;touch-action:none;cursor:pointer}
+    .goods-delete{right:-24px;top:-24px;background:#ef4444}
+    .goods-rotate{left:-24px;top:-24px;cursor:grab}
+    .goods-lock{left:-24px;bottom:-24px;background:#d97706;font-size:19px}
+    .goods-resize{right:-24px;bottom:-24px;cursor:nwse-resize}
+  `;
+  doc.head.appendChild(style);
+  const selected = new Map();
+  const box = doc.createElement('div');
+  box.className = 'goods-selection';
+  box.style.display = 'none';
+  box.innerHTML = '<button class="goods-handle goods-rotate" title="Tourner">↻</button><button class="goods-handle goods-delete" title="Supprimer">×</button><button class="goods-handle goods-lock" title="Verrouiller ou déverrouiller">🔓</button><button class="goods-handle goods-resize" title="Agrandir ou réduire">↘</button>';
+  doc.body.appendChild(box);
+
+  const refreshControls = () => {
+    const productIds = new Set([...selected.values()].filter(item => item.type === 'product').map(item => String(item.index)));
+    const logoIds = new Set([...selected.values()].filter(item => item.type === 'left').map(item => String(item.index)));
+    document.querySelectorAll('[data-product-control]').forEach(control => control.classList.toggle('selected-product-control', productIds.has(control.dataset.productControl)));
+    document.querySelectorAll('[data-logo-control]').forEach(control => control.classList.toggle('selected-product-control', logoIds.has(control.dataset.logoControl)));
+  };
+  const refresh = () => {
+    [...selected].forEach(([key, item]) => {
+      if (!item.el.isConnected) selected.delete(key);
+    });
+    doc.querySelectorAll('.goods-item-selected').forEach(el => el.classList.remove('goods-item-selected'));
+    if (!selected.size) {
+      box.style.display = 'none';
+      refreshControls();
+      return;
+    }
+    const items = [...selected.values()];
+    items.forEach(item => {
+      item.el.classList.add('goods-item-selected');
+      item.el.classList.toggle('goods-item-locked', lockedItems[currentGoodsTab].has(item.key));
+    });
+    const rects = items.map(item => item.el.getBoundingClientRect());
+    const left = Math.min(...rects.map(rect => rect.left));
+    const top = Math.min(...rects.map(rect => rect.top));
+    const right = Math.max(...rects.map(rect => rect.right));
+    const bottom = Math.max(...rects.map(rect => rect.bottom));
+    box.style.display = 'block';
+    box.style.left = left + 'px';
+    box.style.top = top + 'px';
+    box.style.width = (right - left) + 'px';
+    box.style.height = (bottom - top) + 'px';
+    const allLocked = items.every(item => lockedItems[currentGoodsTab].has(item.key));
+    box.classList.toggle('locked', allLocked);
+    box.querySelector('.goods-lock').textContent = allLocked ? '🔒' : '🔓';
+    refreshControls();
+  };
+  const select = (item, additive) => {
+    if (additive) {
+      if (selected.has(item.key)) selected.delete(item.key);
+      else selected.set(item.key, item);
+    } else if (!selected.has(item.key)) {
+      selected.clear();
+      selected.set(item.key, item);
+    }
+    refresh();
+  };
+  const bind = (el, type, index, onInput) => {
+    if (!el || el.classList.contains('missing')) return;
+    const item = {el, type, index, key:type + ':' + index};
+    el.dataset.goodsEditorKey = item.key;
+    el.draggable = false;
+    el.title = type.includes('text') ? 'Cliquez pour modifier, glissez pour déplacer' : 'Glissez pour déplacer — Maj + clic pour sélectionner plusieurs éléments';
+    el.style.cursor = 'grab';
+    if (onInput) el.addEventListener('input', () => onInput(el.innerText.replace(/\r/g, '')));
+    let drag = null;
+    let lastPointerSelection = -Infinity;
+    el.addEventListener('pointerdown', event => {
+      if (!type.includes('text')) event.preventDefault();
+      event.stopPropagation();
+      lastPointerSelection = performance.now();
+      select(item, event.shiftKey);
+      if (lockedItems[currentGoodsTab].has(item.key) || !selected.has(item.key)) return;
+      drag = {
+        x:event.clientX,
+        y:event.clientY,
+        values:[...selected.values()].filter(entry => !lockedItems[currentGoodsTab].has(entry.key)).map(entry => ({item:entry, start:getGoodsItemValues(entry)}))
+      };
+      el.style.cursor = 'grabbing';
+      el.setPointerCapture(event.pointerId);
+    });
+    el.addEventListener('pointermove', event => {
+      if (!drag || !el.hasPointerCapture(event.pointerId)) return;
+      const dx = event.clientX - drag.x;
+      const dy = event.clientY - drag.y;
+      if (Math.abs(dx) + Math.abs(dy) < 2) return;
+      drag.values.forEach(entry => {
+        setGoodsItemValue(entry.item, 'x', entry.start.x + dx);
+        setGoodsItemValue(entry.item, 'y', entry.start.y + dy);
+        applyGoodsItemPreview(entry.item);
+      });
+      refresh();
+    });
+    const finish = event => {
+      if (el.hasPointerCapture(event.pointerId)) el.releasePointerCapture(event.pointerId);
+      el.style.cursor = lockedItems[currentGoodsTab].has(item.key) ? 'not-allowed' : 'grab';
+      drag = null;
+    };
+    el.addEventListener('pointerup', finish);
+    el.addEventListener('pointercancel', finish);
+    el.addEventListener('click', event => {
+      event.stopPropagation();
+      if (performance.now() - lastPointerSelection > 500) select(item, event.shiftKey);
+    });
+  };
+  doc.__refreshGoodsSelection = refresh;
+  doc.__goodsEditor = {bind, selected, refresh};
+
+  box.querySelector('.goods-delete').addEventListener('click', event => {
+    event.preventDefault();
+    event.stopPropagation();
+    deleteGoodsItems([...selected.values()]);
+  });
+  box.querySelector('.goods-lock').addEventListener('click', event => {
+    event.preventDefault();
+    event.stopPropagation();
+    const items = [...selected.values()];
+    const unlock = items.every(item => lockedItems[currentGoodsTab].has(item.key));
+    items.forEach(item => unlock ? lockedItems[currentGoodsTab].delete(item.key) : lockedItems[currentGoodsTab].add(item.key));
+    refresh();
+  });
+  const startHandleDrag = (handle, mode) => {
+    handle.addEventListener('pointerdown', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      const items = [...selected.values()].filter(item => !lockedItems[currentGoodsTab].has(item.key));
+      if (!items.length) return;
+      const boxRect = box.getBoundingClientRect();
+      const centerX = boxRect.left + boxRect.width / 2;
+      const centerY = boxRect.top + boxRect.height / 2;
+      const startAngle = Math.atan2(event.clientY - centerY, event.clientX - centerX) * 180 / Math.PI;
+      const startDistance = Math.max(20, Math.hypot(event.clientX - centerX, event.clientY - centerY));
+      const starts = items.map(item => ({item, values:getGoodsItemValues(item)}));
+      handle.setPointerCapture(event.pointerId);
+      const move = moveEvent => {
+        if (!handle.hasPointerCapture(moveEvent.pointerId)) return;
+        if (mode === 'resize') {
+          const distance = Math.max(5, Math.hypot(moveEvent.clientX - centerX, moveEvent.clientY - centerY));
+          const ratio = distance / startDistance;
+          starts.forEach(entry => setGoodsItemValue(entry.item, 'size', entry.values.size * ratio));
+        } else {
+          const angle = Math.atan2(moveEvent.clientY - centerY, moveEvent.clientX - centerX) * 180 / Math.PI;
+          starts.forEach(entry => setGoodsItemValue(entry.item, 'rot', entry.values.rot + angle - startAngle));
+        }
+        starts.forEach(entry => applyGoodsItemPreview(entry.item));
+        refresh();
+      };
+      const finish = finishEvent => {
+        if (handle.hasPointerCapture(finishEvent.pointerId)) handle.releasePointerCapture(finishEvent.pointerId);
+        handle.removeEventListener('pointermove', move);
+        handle.removeEventListener('pointerup', finish);
+        handle.removeEventListener('pointercancel', finish);
+      };
+      handle.addEventListener('pointermove', move);
+      handle.addEventListener('pointerup', finish);
+      handle.addEventListener('pointercancel', finish);
+    });
+  };
+  startHandleDrag(box.querySelector('.goods-resize'), 'resize');
+  startHandleDrag(box.querySelector('.goods-rotate'), 'rotate');
+  doc.addEventListener('pointerdown', event => {
+    if (event.target.closest('[data-goods-editor-key],.goods-selection')) return;
+    selected.clear();
+    refresh();
+  });
+}
+
+function bindGoodsDraggable(el, type, index) {
+  el?.ownerDocument.__goodsEditor?.bind(el, type, index);
+}
+
+function wirePreviewInteraction() {
+  const iframe = document.getElementById('goodsIframe');
+  const doc = iframe.contentDocument;
+  if (!doc || doc.__goodsInteractionWired) return;
+  doc.__goodsInteractionWired = true;
+  installGoodsEditor(doc);
+  for (let i = 1; i <= MAX_LOGOS; i++) bindGoodsDraggable(doc.querySelector('.left' + i), 'left', i);
+  for (let i = 1; i <= MAX_PRODUCTS; i++) bindGoodsDraggable(doc.querySelector('.fig' + i), 'product', i);
+  const primaryTextIds = {desktop:'bannerText', mobile:'bannerText', social:'storyText', video:'videoText'};
+  const textEl = doc.getElementById(primaryTextIds[currentGoodsTab]);
+  if (textEl) {
+    textEl.contentEditable = 'true';
+    textEl.spellcheck = false;
+    doc.__goodsEditor.bind(textEl, 'primary-text', 'primary', value => {
+      document.getElementById(currentGoodsTab === 'desktop' || currentGoodsTab === 'mobile' ? 'banner_text' : 'series_text').value = value;
+    });
+  }
+  if (currentGoodsTab !== 'social' && currentGoodsTab !== 'video') return;
+  doc.querySelectorAll('.extra-text[data-text-id]').forEach(el => {
+    el.contentEditable = 'true';
+    el.spellcheck = false;
+    doc.__goodsEditor.bind(el, 'extra-text', el.dataset.textId, value => {
+      const text = extraTexts[currentGoodsTab].find(entry => entry.id === el.dataset.textId);
+      if (text) text.text = value;
+    });
+  });
+}
+
+// L'iframe peut finir de charger avant que le navigateur ait atteint la
+// déclaration ci-dessus. Ce second branchement garantit l'interaction sans
+// produire d'erreur au premier affichage.
+document.getElementById('goodsIframe').addEventListener('load', wirePreviewInteraction);
+
+function showLinks() {
+  const box = document.getElementById('linksBox');
+  let html = '<div class="card-title" style="margin-bottom:8px"><span class="num">4</span> Liens HTML goods</div>';
+  Object.keys(goodsConfig).forEach(kind => {
+    const url = buildUrl(kind);
+    const safeUrl = url.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    html += '<p style="font-size:11px;color:var(--muted);font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-top:12px">' + goodsConfig[kind].label + '</p>';
+    html += '<div class="result-url"><span>' + url + '</span><button class="copy-btn" data-url="' + safeUrl + '" onclick="navigator.clipboard.writeText(this.dataset.url);this.textContent=\'ok\'">Copier</button></div>';
+  });
+  box.innerHTML = html;
+  box.classList.add('show');
+}
+
+function setHdStatus(message, type) {
+  const box = document.getElementById('hdStatus');
+  box.textContent = message;
+  box.className = 'hd-status show' + (type ? ' ' + type : '');
+}
+
+const GOODS_STATUS_WEBHOOK_URL = 'https://hook.eu1.make.com/461my7gj6h9uwh9ff2i9wyqvdfaksyz1';
+const GOODS_VIDEO_RENDER_URL = 'https://magic-studio-video-643107855979.europe-west1.run.app';
+let goodsHdPollTimer = null;
+let goodsVideoJobId = null;
+let goodsVideoExportActive = false;
+let goodsVideoCancelRequested = false;
+
+const goodsVideoFormats = {
+  desktop:{label:'Web banner', slug:'web'},
+  mobile:{label:'Mobile banner', slug:'mobile'},
+  social:{label:'Story / Insta', slug:'story'},
+  video:{label:'Vertical dynamique', slug:'vertical'}
+};
+
+function setVideoStatus(message, type) {
+  const box = document.getElementById('videoStatus');
+  box.textContent = message;
+  box.className = 'hd-status show' + (type ? ' ' + type : '');
+}
+
+function waitForVideoPoll(delay) {
+  return new Promise(resolve => setTimeout(resolve, delay));
+}
+
+async function downloadGoodsVideoZip(jobIds, filename) {
+  const query = new URLSearchParams({jobs:jobIds.join(','), filename});
+  const response = await fetch(GOODS_VIDEO_RENDER_URL + '/api/goods-video-zip?' + query);
+  if (!response.ok) {
+    const result = await response.json().catch(() => ({}));
+    throw new Error(result.error || 'Le ZIP n’a pas pu être créé.');
+  }
+  const blob = await response.blob();
+  if (!blob.size) throw new Error('Le ZIP reçu est vide.');
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = objectUrl;
+  link.download = filename;
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+}
+
+async function generateGoodsVideo() {
+  const button = document.getElementById('generateVideoBtn');
+  if (goodsVideoExportActive) {
+    goodsVideoCancelRequested = true;
+    const jobId = goodsVideoJobId;
+    goodsVideoJobId = null;
+    button.disabled = true;
+    button.textContent = '⏳ ANNULATION…';
+    if (jobId) await fetch(GOODS_VIDEO_RENDER_URL + '/api/goods-video-jobs/' + encodeURIComponent(jobId), {method:'DELETE'}).catch(() => {});
+    setVideoStatus('Export vidéo annulé.');
+    return;
+  }
+  const selectedFormats = [...document.querySelectorAll('[data-video-format]:checked')]
+    .map(input => input.value)
+    .filter(kind => goodsVideoFormats[kind]);
+  if (!selectedFormats.length) {
+    setVideoStatus('Cochez au moins un format vidéo à exporter.', 'error');
+    return;
+  }
+  if (!urls.figure1_url) {
+    setVideoStatus('Ajoutez au moins le Produit 1 avant de lancer la vidéo.', 'error');
+    return;
+  }
+  saveControlsForFormat(currentGoodsTab);
+  goodsVideoExportActive = true;
+  goodsVideoCancelRequested = false;
+  button.disabled = false;
+  button.textContent = '✕ ANNULER LES EXPORTS VIDÉO';
+  setVideoStatus('Le moteur vidéo démarre. La première création peut prendre quelques secondes…');
+  const completedJobIds = [];
+  try {
+    for (let index = 0; index < selectedFormats.length; index++) {
+      if (goodsVideoCancelRequested) return;
+      const kind = selectedFormats[index];
+      const format = goodsVideoFormats[kind];
+      const filename = 'magic-studio-goods-' + format.slug + '-' + new Date().toISOString().slice(0,10) + '.mp4';
+      setVideoStatus(format.label + ' — démarrage (' + (index + 1) + '/' + selectedFormats.length + ')…');
+      const response = await fetch(GOODS_VIDEO_RENDER_URL + '/api/goods-video-jobs', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({url:buildUrl(kind), filename})
+      });
+      const created = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(response.status === 429 ? 'La limite de vidéos de cette heure est atteinte.' : (created.error || 'Le moteur vidéo a refusé la demande.'));
+      goodsVideoJobId = created.jobId;
+      if (goodsVideoCancelRequested) {
+        await fetch(GOODS_VIDEO_RENDER_URL + '/api/goods-video-jobs/' + encodeURIComponent(goodsVideoJobId), {method:'DELETE'}).catch(() => {});
+        return;
+      }
+      const startedAt = Date.now();
+      let job = created;
+      while (!goodsVideoCancelRequested && goodsVideoJobId && !['completed','failed','cancelled'].includes(job.status)) {
+        if (Date.now() - startedAt > 12 * 60 * 1000) throw new Error('La génération prend plus de temps que prévu.');
+        const phase = job.status === 'queued' ? 'En attente' : (job.status === 'encoding' ? 'Encodage MP4' : 'Rendu des images');
+        setVideoStatus(format.label + ' — ' + phase + ' — ' + (job.progress || 0) + ' % (' + (index + 1) + '/' + selectedFormats.length + ')');
+        await waitForVideoPoll(1800);
+        if (goodsVideoCancelRequested || !goodsVideoJobId) return;
+        const statusResponse = await fetch(GOODS_VIDEO_RENDER_URL + '/api/goods-video-jobs/' + encodeURIComponent(goodsVideoJobId), {cache:'no-store'});
+        if (!statusResponse.ok) throw new Error('Le suivi de la vidéo a été interrompu.');
+        job = await statusResponse.json();
+      }
+      if (goodsVideoCancelRequested || job.status === 'cancelled') return;
+      if (job.status === 'failed') throw new Error(job.error || 'La génération vidéo a échoué.');
+      completedJobIds.push(goodsVideoJobId);
+      goodsVideoJobId = null;
+    }
+    const zipFilename = 'magic-studio-goods-' + new Date().toISOString().slice(0,10) + '.zip';
+    setVideoStatus('Création du ZIP et envoi vers vos téléchargements…');
+    await downloadGoodsVideoZip(completedJobIds, zipFilename);
+    setVideoStatus('✅ ZIP téléchargé automatiquement avec ' + (selectedFormats.length === 1 ? 'la vidéo MP4.' : 'les ' + selectedFormats.length + ' vidéos MP4.'), 'success');
+  } catch (error) {
+    setVideoStatus(error.message || 'La génération vidéo a échoué.', 'error');
+  } finally {
+    goodsVideoJobId = null;
+    goodsVideoExportActive = false;
+    goodsVideoCancelRequested = false;
+    button.disabled = false;
+    button.textContent = '🎬 EXPORTER ET TÉLÉCHARGER LE ZIP';
+  }
+}
+
+function renderGoodsHdResults(result) {
+  const items = [
+    ['Web', result.desktop_fr],
+    ['Mobile', result.mobile_fr],
+    ['Story / Insta', result.desktop_en]
+  ].filter(item => item[1]);
+  const box = document.getElementById('hdDownloads');
+  box.innerHTML = items.map(item =>
+    '<a class="hd-download" href="' + String(item[1]).replace(/"/g, '&quot;') +
+    '" target="_blank" rel="noopener" download>⬇ Télécharger ' + item[0] + '</a>'
+  ).join('');
+  box.classList.toggle('show', items.length > 0);
+}
+
+async function pollGoodsHdResult(jobId, startedAt) {
+  if (!GOODS_STATUS_WEBHOOK_URL) {
+    setHdStatus('Les PNG sont en cours de création dans Make, mais le webhook de suivi doit encore être relié.', 'error');
+    return;
+  }
+  if (Date.now() - startedAt > 180000) {
+    setHdStatus('La génération prend plus de temps que prévu. Réessayez dans un instant.', 'error');
+    goodsHdPollTimer = null;
+    const button = document.getElementById('generateHdBtn');
+    button.disabled = false;
+    button.textContent = '🚀 GÉNÉRER LES 3 FORMATS HD';
+    return;
+  }
+  try {
+    const response = await fetch(GOODS_STATUS_WEBHOOK_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({job_id: jobId})
+    });
+    if (response.ok) {
+      // Make peut renvoyer le JSON avec un type de contenu imprécis. Lire le
+      // texte puis l'analyser évite qu'une réponse valide bloque le suivi.
+      const rawResult = await response.text();
+      let result = {};
+      try { result = JSON.parse(rawResult); } catch (_) {}
+      if (result.status === 'completed' && result.desktop_fr && result.mobile_fr && result.desktop_en) {
+        renderGoodsHdResults(result);
+        setHdStatus('✅ Les trois PNG sont prêts au téléchargement.', 'success');
+        document.getElementById('generateHdBtn').disabled = false;
+        document.getElementById('generateHdBtn').textContent = '🚀 GÉNÉRER LES 3 FORMATS HD';
+        return;
+      }
+    }
+  } catch (_) {}
+  // Un rendu Make prend généralement 35 à 60 secondes. Interroger toutes les
+  // trois secondes consommait inutilement des opérations Make.
+  goodsHdPollTimer = setTimeout(() => pollGoodsHdResult(jobId, startedAt), 10000);
+}
+
+async function generateGoodsHD() {
+  const button = document.getElementById('generateHdBtn');
+  if (!urls.figure1_url) {
+    setHdStatus('Ajoutez au moins le Produit 1 avant de lancer la génération HD.', 'error');
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = '⏳ PRÉPARATION...';
+  document.getElementById('hdDownloads').classList.remove('show');
+  if (goodsHdPollTimer) clearTimeout(goodsHdPollTimer);
+
+  try {
+    // Fige d'abord le dernier réglage affiché, y compris un déplacement à la souris.
+    saveControlsForFormat(currentGoodsTab);
+    const payload = getParams(currentGoodsTab);
+    payload.job_id = 'goods_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    payload.request_type = 'hd';
+    payload.format_controls = JSON.stringify(formatControls);
+    payload.desktop_controls = JSON.stringify(formatControls.desktop);
+    payload.mobile_controls = JSON.stringify(formatControls.mobile);
+    payload.social_controls = JSON.stringify(formatControls.social);
+    payload.desktop_url = buildUrl('desktop');
+    payload.mobile_url = buildUrl('mobile');
+    payload.social_url = buildUrl('social');
+    payload.video_url = buildUrl('video');
+    // Champs plats pratiques pour Make : chaque module peut aussi les mapper
+    // sans avoir à analyser le JSON format_controls.
+    ['desktop', 'mobile', 'social'].forEach(format => {
+      Object.entries(formatControls[format]).forEach(([key, value]) => {
+        payload[format + '_' + key] = value;
+      });
+    });
+    if (payload.background_mode === 'gradient') payload.bg_url = '';
+
+    // Le scénario Make est linéaire : les emplacements non utilisés réemploient
+    // temporairement le produit 1, puis figure_count les masque dans le rendu.
+    for (let i = 2; i <= MAX_PRODUCTS; i++) {
+      if (!payload['figure' + i + '_url']) payload['figure' + i + '_url'] = payload.figure1_url;
+    }
+
+    button.textContent = '⏳ ENVOI À MAKE...';
+    setHdStatus('Envoi des images et des réglages à Make…');
+    // Démarre le suivi tout de suite. Le webhook principal peut garder la
+    // connexion ouverte jusqu'à la fin du scénario, mais cela ne doit pas
+    // bloquer l'interface ni empêcher la récupération des PNG.
+    const startedAt = Date.now();
+    goodsHdPollTimer = setTimeout(() => pollGoodsHdResult(payload.job_id, startedAt), 35000);
+    button.textContent = '⏳ GÉNÉRATION EN COURS...';
+    setHdStatus('C’est parti ! Make génère les formats Web, Mobile et Story… Comptez environ 40 à 60 secondes.', 'success');
+
+    fetch(MAKE_WEBHOOK_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    }).then(response => {
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+    }).catch(error => {
+      if (goodsHdPollTimer) clearTimeout(goodsHdPollTimer);
+      goodsHdPollTimer = null;
+      setHdStatus('Make n’a pas reçu la demande. Vérifiez que le scénario est activé, puis réessayez. (' + error.message + ')', 'error');
+      button.disabled = false;
+      button.textContent = '🚀 GÉNÉRER LES 3 FORMATS HD';
+    });
+  } catch (error) {
+    setHdStatus('Make n’a pas reçu la demande. Vérifiez que le scénario est activé, puis réessayez. (' + error.message + ')', 'error');
+    button.disabled = false;
+    button.textContent = '🚀 GÉNÉRER LES 3 FORMATS HD';
+  }
+}
+
+function updateBackgroundMode() {
+  const mode = document.querySelector('input[name="background_mode"]:checked')?.value || 'gradient';
+  document.getElementById('backgroundUploadPanel').hidden = mode !== 'upload';
+  document.getElementById('backgroundGradientPanel').hidden = mode !== 'gradient';
+  sendToIframe();
+}
+
+updateFigureVisibility();
+updateBackgroundMode();
+setupControlsDock();
+loadControlsForFormat(currentGoodsTab);
+</script>
+</body>
+</html>

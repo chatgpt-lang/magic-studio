@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1562px;height:395px;overflow:hidden;background:transparent}
+body{position:relative;font-family:Arial,sans-serif}
+.banner{position:absolute;left:10px;top:8px;width:1542px;height:379px;overflow:visible;background:transparent}
+.frame{position:absolute;left:0;right:0;top:0;bottom:34px;border-radius:44px;overflow:hidden;background:#06182a;box-shadow:0 8px 26px rgba(0,0,0,.45)}
+.bg{position:absolute;inset:0;background:transparent;background-size:cover;background-position:center;filter:none}
+.smoke{display:none}
+.left-stack{position:absolute;left:18px;top:14px;width:610px;height:360px;z-index:20;pointer-events:none}
+.left-img{position:absolute;object-fit:contain;filter:drop-shadow(2px 6px 3px rgba(18,24,34,.28));pointer-events:auto}
+.left1{left:-92px;top:-28px;width:310px;height:220px;transform:perspective(360px) rotateY(-16deg) rotateZ(-6deg);transform-origin:center center}
+.left2{left:122px;top:-4px;width:540px;height:208px}
+.left3{left:14px;top:218px;width:410px;height:106px}
+.left4{left:220px;top:205px;width:220px;height:110px}
+.left5{left:430px;top:202px;width:170px;height:115px}
+.figures{position:absolute;left:440px;top:18px;width:1070px;height:440px;z-index:30}
+.fig{position:absolute;object-fit:contain;filter:drop-shadow(0 0 7px var(--product-glow,#fff));transform-origin:center bottom}
+.count-1 .fig1{left:230px;top:-58px;width:610px;height:525px}
+.count-2 .fig1{left:160px;top:-44px;width:530px;height:500px}.count-2 .fig2{left:455px;top:-48px;width:540px;height:505px}
+.count-3 .fig1{left:90px;top:-14px;width:450px;height:455px}.count-3 .fig2{left:335px;top:-62px;width:540px;height:520px}.count-3 .fig3{left:650px;top:-18px;width:455px;height:465px}
+.count-4 .fig1{left:40px;top:-2px;width:365px;height:420px}.count-4 .fig2{left:250px;top:-42px;width:435px;height:465px}.count-4 .fig3{left:510px;top:-48px;width:455px;height:470px}.count-4 .fig4{left:755px;top:-2px;width:365px;height:420px}
+.count-5 .fig1{left:35px;top:12px;width:330px;height:405px}.count-5 .fig2{left:205px;top:-24px;width:395px;height:450px}.count-5 .fig3{left:405px;top:-62px;width:470px;height:495px}.count-5 .fig4{left:655px;top:-22px;width:395px;height:450px}.count-5 .fig5{left:850px;top:12px;width:330px;height:405px}
+.banner-text{position:absolute;left:510px;right:60px;bottom:48px;z-index:60;color:#fff;font-family:'Bebas Neue','Arial Black',Impact,sans-serif;font-size:52px;font-weight:400;line-height:1;text-align:center;text-transform:uppercase;letter-spacing:1px;text-shadow:0 4px 0 rgba(0,0,0,.62),0 9px 16px rgba(0,0,0,.42);white-space:pre-wrap;transform-origin:center}
+.motion-enabled .left-stack,.motion-enabled .figures{animation:goodsFloat calc(var(--motion-duration,4.8s) * var(--motion-speed-factor,1)) ease-in-out infinite;will-change:translate}
+.motion-enabled .left-stack{--motion-x:calc(-5px * var(--motion-mult,.45));--motion-y:calc(6px * var(--motion-mult,.45));--motion-duration:5.3s}
+.motion-enabled .figures{--motion-x:calc(5px * var(--motion-mult,.45));--motion-y:calc(-8px * var(--motion-mult,.45));--motion-duration:4.9s}
+@keyframes goodsFloat{0%,100%{translate:0 0}50%{translate:var(--motion-x,0) var(--motion-y,-6px)}}
+@media (prefers-reduced-motion:reduce){.motion-enabled *{animation:none!important}}
+.missing{display:none}
+</style>
+</head>
+<body>
+<div class="banner">
+  <div class="frame">
+    <div class="bg"></div>
+  <div class="smoke"></div>
+  </div>
+  <div class="left-stack">
+    <img class="left-img left1" data-src="left1_url">
+    <img class="left-img left2" data-src="left2_url">
+    <img class="left-img left3" data-src="left3_url">
+    <img class="left-img left4" data-src="left4_url">
+    <img class="left-img left5" data-src="left5_url">
+  </div>
+  <div class="figures">
+    <img class="fig fig1" data-src="figure1_url">
+    <img class="fig fig2" data-src="figure2_url">
+    <img class="fig fig3" data-src="figure3_url">
+    <img class="fig fig4" data-src="figure4_url">
+    <img class="fig fig5" data-src="figure5_url">
+  </div>
+  <div class="banner-text" id="bannerText"></div>
+</div>
+<script>
+const p = new URLSearchParams(window.location.search);
+const g = key => p.get(key) || '';
+const MAX_PRODUCTS = 20;
+const MAX_LOGOS = 5;
+const count = Math.max(1, Math.min(MAX_PRODUCTS, Number(g('figure_count') || 3)));
+const figureBox = document.querySelector('.figures');
+for (let i = 6; i <= MAX_PRODUCTS; i++) figureBox.insertAdjacentHTML('beforeend', '<img class="fig fig' + i + '" data-src="figure' + i + '_url">');
+figureBox.classList.add('count-' + count);
+const bgUrl = g('bg_url');
+if (bgUrl) document.querySelector('.bg').style.backgroundImage = "url('" + bgUrl + "')";
+else document.querySelector('.bg').style.backgroundImage = 'linear-gradient(135deg,' + (g('fallback_bg') || '#06233a') + ',' + (g('fallback_bg2') || '#2f80c9') + ')';
+document.querySelectorAll('img[data-src]').forEach(img => {
+  const key = img.getAttribute('data-src');
+  const url = g(key);
+  if (/left([1-5])_url/.test(key) && g('show_left' + key.match(/left([1-5])_url/)[1]) === '0') {
+    img.classList.add('missing');
+    return;
+  }
+  if (!url || (/figure(\d+)_url/.test(key) && Number(key.match(/figure(\d+)_url/)[1]) > count)) {
+    img.classList.add('missing');
+    return;
+  }
+  img.src = url;
+});
+document.documentElement.style.setProperty('--product-glow', g('product_glow') || '#ffffff');
+const bannerText = document.getElementById('bannerText');
+bannerText.textContent = p.has('banner_text') ? p.get('banner_text') : 'Maintenant disponible';
+bannerText.style.color = /^#[0-9a-f]{6}$/i.test(g('banner_text_color')) ? g('banner_text_color') : '#ffffff';
+bannerText.style.fontSize = (52 * Math.max(20, Math.min(400, Number(g('banner_text_size') || 100))) / 100) + 'px';
+bannerText.style.bottom = (48 - Number(g('banner_text_y') || 0)) + 'px';
+bannerText.style.transform = 'translateX(' + Number(g('banner_text_x') || 0) + 'px) rotate(' + Number(g('banner_text_rot') || 0) + 'deg)';
+if (g('show_text') === '0') bannerText.classList.add('missing');
+function configureMotion() {
+  if (g('animation') !== '1') return;
+  const intensity = Math.max(0, Math.min(100, Number(g('animIntensity') || 45))) / 100;
+  const speed = Math.max(10, Math.min(100, Number(g('animSpeed') || 60))) / 100;
+  document.body.classList.add('motion-enabled');
+  document.documentElement.style.setProperty('--motion-mult', intensity.toFixed(2));
+  document.documentElement.style.setProperty('--motion-speed-factor', (1.55 - speed).toFixed(2));
+}
+function applyLeftControls() {
+  for (let i = 1; i <= MAX_LOGOS; i++) {
+    const img = document.querySelector('.left' + i);
+    if (!img || img.classList.contains('missing')) continue;
+    const size = Number(g('left' + i + '_size') || 100) / 100;
+    const x = Number(g('left' + i + '_x') || 0);
+    const y = Number(g('left' + i + '_y') || 0);
+    const rot = Number(g('left' + i + '_rot') || 0);
+    img.style.transform = i === 1
+      ? 'translate(' + x + 'px,' + y + 'px) scale(' + size + ') perspective(360px) rotateY(-16deg) rotateZ(' + (-6 + rot) + 'deg)'
+      : 'translate(' + x + 'px,' + y + 'px) scale(' + size + ') rotate(' + rot + 'deg)';
+  }
+}
+function applyProductControls() {
+  if (count > 5) {
+    const rows = count > 9 ? 2 : 1;
+    const columns = Math.ceil(count / rows);
+    const width = Math.min(300, 1070 / (columns + .25) * 1.45);
+    const height = Math.min(390, width * 1.42);
+    document.querySelectorAll('.fig:not(.missing)').forEach((img, index) => {
+      const row = Math.floor(index / columns);
+      const column = index % columns;
+      img.style.left = (column * ((1070 - width) / Math.max(1, columns - 1))) + 'px';
+      img.style.top = (row * 155 + (column % 2 ? 12 : 30)) + 'px';
+      img.style.width = width + 'px';
+      img.style.height = height + 'px';
+    });
+  }
+  for (let i = 1; i <= MAX_PRODUCTS; i++) {
+    const img = document.querySelector('.fig' + i);
+    if (!img || img.classList.contains('missing')) continue;
+    const size = Number(g('product' + i + '_size') || 118) / 100;
+    const x = Number(g('product' + i + '_x') || 0);
+    const y = Number(g('product' + i + '_y') || 0);
+    const rot = Number(g('product' + i + '_rot') || 0);
+    const z = Number(g('product' + i + '_z') || (20 + i));
+    img.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + size + ') rotate(' + rot + 'deg)';
+    img.style.zIndex = z;
+  }
+}
+applyLeftControls();
+applyProductControls();
+configureMotion();
+document.fonts?.ready?.then(() => document.documentElement.classList.add('fonts-ready'));
+</script>
+</body>
+</html>
