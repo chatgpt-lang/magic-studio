@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <title>Magic Studio</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<script>(function(){var p=new URLSearchParams(location.search).get('part');if(p){document.documentElement.classList.add('embed','embed-'+p)}if(p==='logo'){addEventListener('DOMContentLoaded',function(){var a=document.getElementById('logoLink');a.href='https://www.sarahlittledoodles.com/';a.target='_top'})}})()</script>
+<script>(function(){var p=new URLSearchParams(location.search).get('part');if(p){document.documentElement.classList.add('embed','embed-'+p)}if(p==='offres'||p==='faq'||p==='tirage'||p==='creer'){addEventListener('DOMContentLoaded',function(){document.querySelectorAll('a[href="#contact"]').forEach(function(l){var t=(l.textContent||'').trim();l.href='mailto:messbah.sarah@gmail.com?subject='+encodeURIComponent('Magic Studio : '+t);l.target='_top'});if(p==='faq'){document.querySelectorAll('#faq details').forEach(function(d){d.open=true})}})}if(p==='logo'){addEventListener('DOMContentLoaded',function(){var a=document.getElementById('logoLink');a.href='https://www.sarahlittledoodles.com/';a.target='_top'})}})()</script>
 <meta name="description" content="Magic Studio : bannières, posts et stories e-commerce en moins d'une minute. Visuels HD, intégration 3D, fonds animés et effets sur mesure pour les boutiques TCG et e-commerçants.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -148,6 +148,8 @@ html.embed-creer main>#premium,html.embed-tirage main>#premium{display:block!imp
 html.embed-creer #premium .sec-head,html.embed-creer #premium .orb,html.embed-creer #tirage,html.embed-creer .adapt-strip{display:none!important}
 html.embed-tirage #premium .sec-head,html.embed-tirage #premium .orb,html.embed-tirage #creer,html.embed-tirage .adapt-strip{display:none!important}
 html.embed-galerie main>#realisations{display:block!important}
+html.embed-offres main>#offres,html.embed-faq main>#faq{display:block!important}
+html.embed-faq #faq{padding-top:8px!important}
 html.embed-logo{color-scheme:light}
 html.embed-logo,html.embed-logo body{background:transparent!important}
 html.embed-logo header{display:block!important;position:static;background:transparent;border:0;backdrop-filter:none}
