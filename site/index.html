@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <title>Magic Studio</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<script>(function(){var p=new URLSearchParams(location.search).get('part');if(p){document.documentElement.classList.add('embed','embed-'+p)}})()</script>
+<script>(function(){var p=new URLSearchParams(location.search).get('part');if(p){document.documentElement.classList.add('embed','embed-'+p)}if(p==='logo'){addEventListener('DOMContentLoaded',function(){var a=document.getElementById('logoLink');a.href='https://www.sarahlittledoodles.com/';a.target='_top'})}})()</script>
 <meta name="description" content="Magic Studio : bannières, posts et stories e-commerce en moins d'une minute. Visuels HD, intégration 3D, fonds animés et effets sur mesure pour les boutiques TCG et e-commerçants.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -89,8 +89,8 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:co
 .field i{width:14px;height:14px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.25)}
 .field.active{border-color:var(--lime)}
 .gen-go{background:var(--lime);color:var(--ink);border-radius:10px;font-weight:700;padding:0 18px;font-size:14px;display:grid;place-items:center;white-space:nowrap}
-.fr{position:relative;width:100%;max-width:100%;overflow:hidden;border-radius:12px;background:var(--panel-2)}
-.fr .bframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;opacity:0;transition:opacity .6s;pointer-events:none;background:transparent}
+.fr{position:relative;width:100%;max-width:100%;overflow:hidden;border-radius:12px;background:var(--panel)}
+.fr .bframe{color-scheme:light;position:absolute;left:0;top:0;border:0;transform-origin:0 0;opacity:0;transition:opacity .6s;pointer-events:none;background:transparent}
 .fr .bframe.on{opacity:1;z-index:1}
 .fr-tag{position:absolute;left:8px;top:8px;z-index:3;font:700 10px/1 var(--f-body);letter-spacing:.06em;background:var(--ink);color:var(--lime);border:1px solid var(--lime);border-radius:999px;padding:5px 8px}
 .fr.flash::after{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.3) 50%,transparent 70%);animation:scan .9s ease-out forwards;transform:translateX(-120%)}
@@ -126,7 +126,7 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:co
 .bank-wrap{position:relative}
 .bank{display:flex;gap:14px;overflow-x:auto;scroll-padding-inline:4px;padding-bottom:12px;height:300px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
 .tile{margin:0;position:relative;flex:none;height:100%;aspect-ratio:var(--r);max-width:none;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--panel-2);scroll-snap-align:start}
-.tile.live iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;pointer-events:none;background:transparent}
+.tile.live iframe{color-scheme:light;position:absolute;left:0;top:0;border:0;transform-origin:0 0;pointer-events:none;background:transparent}
 .bank-nav{position:absolute;top:calc(50% - 30px);z-index:5;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:color-mix(in srgb,var(--ink) 80%,transparent);color:var(--text);font:400 26px/1 var(--f-body);cursor:pointer;display:grid;place-items:center}
 .bank-nav.prev{left:-10px}.bank-nav.next{right:-10px}
 .bank-nav:hover{border-color:var(--lime);color:var(--lime)}
@@ -148,6 +148,12 @@ html.embed-creer main>#premium,html.embed-tirage main>#premium{display:block!imp
 html.embed-creer #premium .sec-head,html.embed-creer #premium .orb,html.embed-creer #tirage,html.embed-creer .adapt-strip{display:none!important}
 html.embed-tirage #premium .sec-head,html.embed-tirage #premium .orb,html.embed-tirage #creer,html.embed-tirage .adapt-strip{display:none!important}
 html.embed-galerie main>#realisations{display:block!important}
+html.embed-logo,html.embed-logo body{background:transparent!important}
+html.embed-logo header{display:block!important;position:static;background:transparent;border:0;backdrop-filter:none}
+html.embed-logo header .wrap{padding:0;max-width:none}
+html.embed-logo .nav{padding:0;height:100vh;align-items:center}
+html.embed-logo .links,html.embed-logo .nav .btn{display:none!important}
+html.embed-logo .logo{font-size:22px}
 html.embed-galerie #realisations .sec-head{display:none!important}
 /* sections */
 section{padding-block:88px}
@@ -310,7 +316,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 
 <header>
   <div class="wrap nav">
-    <a class="logo" href="#top" aria-label="Magic Studio, accueil"><i></i><span>Magic Studio</span></a>
+    <a class="logo" href="#top" aria-label="Magic Studio, accueil" id="logoLink"><i></i><span>Magic Studio</span></a>
     <nav class="links" aria-label="Navigation principale">
       <a href="#outil">L'outil</a><a href="#creer">Créer mon visuel</a><a href="#offres">Offres</a><a href="#faq">FAQ</a>
     </nav>
