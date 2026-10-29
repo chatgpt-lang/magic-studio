@@ -581,7 +581,6 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
   </section>
 </main>
 
-<link rel="stylesheet" href="kuji/police.css">
 <script>
 /* version anglaise : ?lang=en */
 window.EN=new URLSearchParams(location.search).get('lang')==='en';
@@ -674,10 +673,6 @@ window.EN_DICT={
  document.querySelectorAll('[aria-label],[alt],[placeholder],[title]').forEach(function(el){['aria-label','alt','placeholder','title'].forEach(function(a){var v=el.getAttribute(a);if(v&&D[v.trim()])el.setAttribute(a,D[v.trim()])})});
 })();
 </script>
-<script src="kuji/three.js"></script>
-<script src="kuji/urne.js"></script>
-<script src="kuji/ticket.js"></script>
-<script src="kuji/logo-licence.js"></script>
 <!-- booster en dernier : il remplace window.THREE par sa propre version (r128), ticket.js a déjà gardé la sienne (r160) -->
 <script src="demo/booster-opening.bundle.js"></script>
 <footer><div class="wrap"><span>© 2026 Magic Studio · Tokyo</span><a href="https://www.tiktok.com/@sarahslittledoodles">TikTok</a></div></footer>
