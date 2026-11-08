@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Magic Studio – Avantages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fahkwang:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --lime:#c8f53a;
+    --txt:#ffffff;
+    --muted:rgba(255,255,255,.70);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:transparent}
+  body{
+    font-family:Helvetica,Arial,sans-serif;
+    color:var(--txt);
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+  .wrap{
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    gap:40px;
+    flex-wrap:wrap;
+    max-width:1000px;
+    margin:0 auto;
+    padding:26px 20px;
+  }
+  .card{
+    flex:1 1 220px;
+    max-width:300px;
+    text-align:center;
+    opacity:0;
+    transform:translateY(28px);
+    transition:opacity .7s cubic-bezier(.22,.61,.36,1), transform .7s cubic-bezier(.22,.61,.36,1);
+  }
+  .card.in{opacity:1;transform:translateY(0)}
+  .card:nth-child(1){transition-delay:.00s}
+  .card:nth-child(2){transition-delay:.14s}
+  .card:nth-child(3){transition-delay:.28s}
+
+  .ico{
+    width:68px;height:68px;
+    margin:0 auto 18px;
+    color:var(--lime);
+    filter:drop-shadow(0 0 5px rgba(200,245,58,.55)) drop-shadow(0 0 11px rgba(200,245,58,.35));
+    animation:pulse 3.2s ease-in-out infinite;
+    transition:transform .35s ease;
+  }
+  .card:nth-child(2) .ico{animation-delay:.5s}
+  .card:nth-child(3) .ico{animation-delay:1s}
+  .ico svg{width:100%;height:100%;display:block}
+  .card:hover .ico{
+    transform:translateY(-3px) scale(1.06);
+    filter:drop-shadow(0 0 7px rgba(200,245,58,.8)) drop-shadow(0 0 18px rgba(200,245,58,.5));
+  }
+
+  @keyframes pulse{
+    0%,100%{filter:drop-shadow(0 0 5px rgba(200,245,58,.50)) drop-shadow(0 0 11px rgba(200,245,58,.30))}
+    50%{filter:drop-shadow(0 0 8px rgba(200,245,58,.75)) drop-shadow(0 0 20px rgba(200,245,58,.50))}
+  }
+
+  .title{
+    font-family:'Fahkwang',serif;
+    font-weight:700;
+    font-size:20px;
+    letter-spacing:.2px;
+    margin-bottom:10px;
+    color:#fff;
+  }
+  .desc{
+    font-size:13.5px;
+    line-height:1.6;
+    color:var(--muted);
+    max-width:230px;
+    margin:0 auto;
+  }
+
+  @media (max-width:560px){
+    .wrap{gap:30px;padding:22px 18px}
+    .card{flex:1 1 100%;max-width:340px}
+    .ico{width:60px;height:60px;margin-bottom:14px}
+    .title{font-size:19px}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .card{transition:opacity .4s ease;transform:none}
+    .ico{animation:none}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="ico">
+        <svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="60" cy="60" r="52"/>
+          <path d="M66 32 L46 64 h14 l-6 24 l20 -32 h-14 z" fill="currentColor" stroke="currentColor" stroke-width="3"/>
+        </svg>
+      </div>
+      <div class="title">Gain de temps</div>
+      <div class="desc">Créez des visuels prêts à publier en quelques clics.</div>
+    </div>
+
+    <div class="card">
+      <div class="ico">
+        <svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="60" cy="60" r="52"/>
+          <path d="M73 46 a17 20 0 1 0 0 28"/>
+          <line x1="39" y1="56" x2="67" y2="56"/>
+          <line x1="39" y1="65" x2="64" y2="65"/>
+        </svg>
+      </div>
+      <div class="title">Réduction des coûts</div>
+      <div class="desc">Produisez davantage de contenus sans multiplier les heures de design.</div>
+    </div>
+
+    <div class="card">
+      <div class="ico">
+        <svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="60" cy="60" r="52"/>
+          <path d="M42 61 l12 13 l25 -28"/>
+        </svg>
+      </div>
+      <div class="title">Identité cohérente</div>
+      <div class="desc">Des visuels toujours alignés avec votre image de marque.</div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      var cards=[].slice.call(document.querySelectorAll('.card'));
+      function reveal(){cards.forEach(function(c){c.classList.add('in')})}
+      if('IntersectionObserver' in window){
+        var io=new IntersectionObserver(function(ents){
+          ents.forEach(function(e){ if(e.isIntersecting){ reveal(); io.disconnect(); } });
+        },{threshold:.25});
+        io.observe(document.querySelector('.wrap'));
+        // fallback: if already in view on load
+        setTimeout(function(){
+          var r=document.querySelector('.wrap').getBoundingClientRect();
+          if(r.top < (window.innerHeight||800)) reveal();
+        },300);
+      } else { reveal(); }
+    })();
+  </script>
+</body>
+</html>
