@@ -764,7 +764,7 @@ window.EN_DICT={
     await sleep(400);toast.classList.add('on');busy=false;
   }
   tabs.forEach(t=>t.addEventListener('click',()=>{auto=false;show(+t.dataset.i,true)}));
-  (async function loop(){await sleep(8000);while(auto){await show(1-cur,true);await sleep(8000)}})();
+  (async function loop(){await sleep(1100);if(auto)await show(0,true);while(auto){await sleep(6500);await show(1-cur,true)}})();
 
   /* vidéos de la galerie : chargées seulement quand visibles */
   const lv=[...document.querySelectorAll('video.lazyv')];
