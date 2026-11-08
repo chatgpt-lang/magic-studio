@@ -313,6 +313,52 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
   .nav .btn{display:none}
   .viewport{height:340px}
 }
+
+/* ===== polish "waouh" : CTA lumineux, cartes vivantes, accents animés ===== */
+/* Boutons principaux : halo qui respire + reflet qui balaie au survol */
+.btn-lime,.gen-go{position:relative;overflow:hidden;isolation:isolate;animation:ctaGlow 3.4s ease-in-out infinite}
+@keyframes ctaGlow{
+  0%,100%{box-shadow:0 8px 26px -12px color-mix(in srgb,var(--lime) 70%,transparent)}
+  50%{box-shadow:0 12px 40px -10px color-mix(in srgb,var(--lime) 92%,transparent),0 0 26px -6px color-mix(in srgb,var(--lime) 55%,transparent)}
+}
+.btn-lime::after,.gen-go::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(110deg,transparent 38%,rgba(255,255,255,.5) 50%,transparent 62%);transform:translateX(-140%);transition:transform .65s ease}
+.btn-lime:hover::after,.gen-go:hover::after{transform:translateX(140%)}
+.btn-lime:hover,.gen-go:hover{transform:translateY(-2px)}
+.btn-lime:active,.gen-go:active{transform:translateY(0) scale(.98)}
+/* le contenu du bouton reste au-dessus du reflet */
+.gen-go>*{position:relative;z-index:2}
+
+/* Boutons secondaires : liseré néon au survol */
+.btn-ghost{transition:transform .2s,border-color .25s,box-shadow .25s,color .2s}
+.btn-ghost:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--violet) 70%,var(--line));box-shadow:0 10px 30px -14px color-mix(in srgb,var(--violet) 80%,transparent)}
+
+/* Cartes d'offres : se soulèvent avec une lueur ; l'offre phare "respire" */
+.offer{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,border-color .35s}
+.offer:hover{transform:translateY(-6px);border-color:color-mix(in srgb,var(--lime) 55%,var(--line));box-shadow:0 34px 64px -34px color-mix(in srgb,var(--lime) 45%,transparent)}
+.offer.feat{animation:featGlow 4.5s ease-in-out infinite}
+.offer.feat:hover{transform:translateY(-6px)}
+@keyframes featGlow{
+  0%,100%{box-shadow:0 0 0 1px var(--pink),0 24px 52px -32px color-mix(in srgb,var(--pink) 60%,transparent)}
+  50%{box-shadow:0 0 0 1px var(--pink),0 30px 72px -28px color-mix(in srgb,var(--pink) 92%,transparent),0 0 32px -8px color-mix(in srgb,var(--pink) 45%,transparent)}
+}
+
+/* Petits accents (chips/eyebrow) : léger dégradé qui ondule */
+.eyebrow{background:linear-gradient(90deg,var(--lime),var(--violet),var(--pink),var(--lime));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:accentFlow 7s linear infinite}
+@keyframes accentFlow{to{background-position:300% 0}}
+
+/* Timer du hero : pulsation discrète pour attirer l'oeil */
+.timer{animation:timerPulse 2.6s ease-in-out infinite}
+@keyframes timerPulse{0%,100%{opacity:.85}50%{opacity:1;text-shadow:0 0 12px color-mix(in srgb,var(--lime) 55%,transparent)}}
+
+/* La grande carte du générateur : halo néon vivant */
+.gen{transition:box-shadow .5s,transform .5s}
+.gen:hover{box-shadow:0 40px 90px -40px color-mix(in srgb,var(--violet) 55%,transparent),0 0 0 1px color-mix(in srgb,var(--violet) 40%,var(--line))}
+
+@media (prefers-reduced-motion:reduce){
+  .btn-lime,.gen-go,.offer.feat,.eyebrow,.timer{animation:none!important}
+  .btn-lime::after,.gen-go::after{display:none}
+  .eyebrow{-webkit-text-fill-color:currentColor;background:none}
+}
 </style>
 
 <div class="mock-note"><div class="wrap">Maquette de proposition · Magic Studio · tout est modifiable</div></div>
