@@ -502,16 +502,16 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
           <div class="pick">
             <span class="pick-label"><b>1</b>Choisissez un booster</span>
             <div class="choices" id="packChoices">
-              <button type="button" class="choice" data-src="demo/pack-dracaufeu.webp" aria-pressed="true" aria-label="Booster Dracaufeu" style="background-image:url(demo/pack-dracaufeu.webp)"></button>
-              <button type="button" class="choice" data-src="demo/pack-mewtwo.png" aria-pressed="false" aria-label="Booster Mewtwo" style="background-image:url(demo/pack-mewtwo.png)"></button>
+              <button type="button" class="choice" data-src="demo/pack-dracaufeu-m.webp" aria-pressed="true" aria-label="Booster Dracaufeu" style="background-image:url(demo/pack-dracaufeu-m.webp)"></button>
+              <button type="button" class="choice" data-src="demo/pack-mewtwo-m.webp" aria-pressed="false" aria-label="Booster Mewtwo" style="background-image:url(demo/pack-mewtwo-m.webp)"></button>
               <label class="choice up">Votre<br>booster<input type="file" accept="image/*" id="packUp"></label>
             </div>
           </div>
           <div class="pick">
             <span class="pick-label"><b>2</b>Choisissez la carte révélée</span>
             <div class="choices" id="cardChoices">
-              <button type="button" class="choice" data-src="demo/card-mewtwo.webp" aria-pressed="true" aria-label="Carte Mewtwo" style="background-image:url(demo/card-mewtwo.webp)"></button>
-              <button type="button" class="choice" data-src="demo/card-dracaufeu.png" aria-pressed="false" aria-label="Carte Dracaufeu" style="background-image:url(demo/card-dracaufeu.png)"></button>
+              <button type="button" class="choice" data-src="demo/card-mewtwo-m.webp" aria-pressed="true" aria-label="Carte Mewtwo" style="background-image:url(demo/card-mewtwo-m.webp)"></button>
+              <button type="button" class="choice" data-src="demo/card-dracaufeu-m.webp" aria-pressed="false" aria-label="Carte Dracaufeu" style="background-image:url(demo/card-dracaufeu-m.webp)"></button>
               <label class="choice up">Votre<br>carte<input type="file" accept="image/*" id="cardUp"></label>
             </div>
           </div>
@@ -761,8 +761,8 @@ window.EN_DICT={
  document.querySelectorAll('[aria-label],[alt],[placeholder],[title]').forEach(function(el){['aria-label','alt','placeholder','title'].forEach(function(a){var v=el.getAttribute(a);if(v&&D[v.trim()])el.setAttribute(a,D[v.trim()])})});
 })();
 </script>
-<!-- booster en dernier : il remplace window.THREE par sa propre version (r128), ticket.js a déjà gardé la sienne (r160) -->
-<script>if(new URLSearchParams(location.search).get('part')==='creer'){document.write('<script src="demo/booster-opening.bundle.js"><\/script>')}</script>
+<!-- booster 3D (840 Ko) : chargé à la demande via loadBundle(), jamais sur mobile, pour alléger le chargement -->
+
 <footer><div class="wrap"><span>© 2026 Magic Studio · Tokyo</span><a href="https://www.tiktok.com/@sarahslittledoodles">TikTok</a></div></footer>
 
 <script>
@@ -853,22 +853,38 @@ window.EN_DICT={
   }
 
   /* crée ton visuel : animation booster 3D */
-  const mk={pack:'demo/pack-dracaufeu.webp',card:'demo/card-mewtwo.webp',back:'demo/card-back.webp'};
+  const mk={pack:'demo/pack-dracaufeu-m.webp',card:'demo/card-mewtwo-m.webp',back:'demo/card-back-m.webp'};
   const bStage=document.getElementById('boosterStage'),mkWait=document.getElementById('mkWait'),mkReplay=document.getElementById('mkReplay');
-  let ctrl=null,mounted=false;
+  const NARROW=window.matchMedia('(max-width:560px)').matches||(window.innerWidth>0&&window.innerWidth<=560);
+  let ctrl=null,mounted=false,bundleP=null;
+  /* charge le bundle 3D (840 Ko) une seule fois, à la demande */
+  function loadBundle(){
+    if(window.BoosterOpening)return Promise.resolve();
+    if(bundleP)return bundleP;
+    bundleP=new Promise((res,rej)=>{var s=document.createElement('script');s.src='demo/booster-opening.bundle.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+    return bundleP;
+  }
+  /* aperçu léger sur mobile : la carte choisie, sans 3D */
+  function showStatic(){
+    bStage.style.background="url('"+mk.card+"') center/contain no-repeat";
+    mkWait.hidden=true;mkReplay.hidden=true;mounted=true;
+  }
   function mountBooster(){
-    if(!window.BoosterOpening){mkWait.textContent=T("L'animation 3D n'a pas pu se charger.");return}
-    try{ctrl&&ctrl.destroy()}catch(e){}
+    if(NARROW){showStatic();return}
     mkWait.hidden=false;mkWait.textContent=T("Préparation de votre animation…");mkReplay.hidden=true;
-    ctrl=BoosterOpening.mount(bStage,{pack:mk.pack,card:mk.card,back:mk.back,holo:.8,saturation:1,brightness:1,cut:.5,bottomInset:0,tilt:true,autoplay:!reduce,
-      onReady:r=>{mkWait.hidden=true;if(reduce)r.seek(6.6);else r.replay()},
-      onEnd:()=>{mkReplay.hidden=false},
-      onError:()=>{mkWait.hidden=false;mkWait.textContent=T("Impossible de lire cette image.")}});
-    mounted=true;
+    loadBundle().then(function(){
+      if(!window.BoosterOpening){mkWait.hidden=false;mkWait.textContent=T("L'animation 3D n'a pas pu se charger.");return}
+      try{ctrl&&ctrl.destroy()}catch(e){}
+      ctrl=BoosterOpening.mount(bStage,{pack:mk.pack,card:mk.card,back:mk.back,holo:.8,saturation:1,brightness:1,cut:.5,bottomInset:0,tilt:true,autoplay:!reduce,
+        onReady:r=>{mkWait.hidden=true;if(reduce)r.seek(6.6);else r.replay()},
+        onEnd:()=>{mkReplay.hidden=false},
+        onError:()=>{mkWait.hidden=false;mkWait.textContent=T("Impossible de lire cette image.")}});
+      mounted=true;
+    }).catch(function(){mkWait.hidden=false;mkWait.textContent=T("L'animation 3D n'a pas pu se charger.")});
   }
   function pickGroup(id,key){
     const g=document.getElementById(id);
-    g.addEventListener('click',e=>{const b=e.target.closest('button.choice');if(!b)return;g.querySelectorAll('.choice').forEach(c=>c.setAttribute('aria-pressed',c===b));mk[key]=b.dataset.src});
+    g.addEventListener('click',e=>{const b=e.target.closest('button.choice');if(!b)return;g.querySelectorAll('.choice').forEach(c=>c.setAttribute('aria-pressed',c===b));mk[key]=b.dataset.src;if(NARROW)showStatic();});
   }
   pickGroup('packChoices','pack');pickGroup('cardChoices','card');
   function upload(inputId,groupId,key){
@@ -882,7 +898,9 @@ window.EN_DICT={
   document.getElementById('swatches').addEventListener('click',e=>{const b=e.target.closest('.sw');if(!b)return;document.querySelectorAll('#swatches .sw').forEach(s=>s.setAttribute('aria-pressed',s===b));document.getElementById('makerStage').style.setProperty('--bgA',b.dataset.bg)});
   document.getElementById('makeGo').addEventListener('click',()=>{mountBooster();document.getElementById('makerStage').scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'})});
   mkReplay.addEventListener('click',()=>{if(ctrl){mkReplay.hidden=true;ctrl.replay()}});
-  if('IntersectionObserver' in window){const io2=new IntersectionObserver(es=>{if(es[0].isIntersecting&&!mounted){mountBooster();io2.disconnect()}},{rootMargin:'200px'});io2.observe(document.getElementById('makerStage'))}else mountBooster();
+  if(NARROW){showStatic();}
+  else if('IntersectionObserver' in window){const io2=new IntersectionObserver(es=>{if(es[0].isIntersecting&&!mounted){mountBooster();io2.disconnect()}},{rootMargin:'200px'});io2.observe(document.getElementById('makerStage'))}
+  else mountBooster();
   /* tirage au sort 3D : ticket.js + urne.js de l'outil Kuji */
   const KCFG={identifiant:'demo-magic-studio',couleurTicket:'#141414',couleurAccent:'#c1121f',logoEnBlanc:true,
     textesTicket:{devant:'※その場で開封し、商品とお引き換えください。',languette:'ここからゆっくり開けてください',bandeauTitre:'店舗ひきとり用',bandeauDetail:'表面の店舗IDを確認の上、商品をお渡し下さい。',apresLettre:'賞',lastOne:'ラストワン',basDuTicket:'※購入店舗のみ有効',aEmporter:'お客様お持ち帰り用',numeroTicket:'くじ券ID'},
