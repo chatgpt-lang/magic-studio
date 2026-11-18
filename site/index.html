@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <title>Magic Studio</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<script>(function(){var p=new URLSearchParams(location.search).get('part');if(p){document.documentElement.classList.add('embed','embed-'+p)}if(p==='offres'||p==='faq'||p==='tirage'||p==='creer'){addEventListener('DOMContentLoaded',function(){document.querySelectorAll('a[href="#contact"]').forEach(function(l){var t=(l.textContent||'').trim();l.href='mailto:messbah.sarah@gmail.com?subject='+encodeURIComponent('Magic Studio : '+t);l.target='_top'});})}if(p==='logo'){addEventListener('DOMContentLoaded',function(){var a=document.getElementById('logoLink');a.href='https://www.sarahlittledoodles.com/';a.target='_top'})}})()</script>
+<script>(function(){var p=new URLSearchParams(location.search).get('part')||decodeURIComponent((location.hash||'').slice(1))||'';if(p){document.documentElement.classList.add('embed','embed-'+p)}if(p==='offres'||p==='faq'||p==='tirage'||p==='creer'){addEventListener('DOMContentLoaded',function(){document.querySelectorAll('a[href="#contact"]').forEach(function(l){var t=(l.textContent||'').trim();l.href='mailto:messbah.sarah@gmail.com?subject='+encodeURIComponent('Magic Studio : '+t);l.target='_top'});})}if(p==='logo'){addEventListener('DOMContentLoaded',function(){var a=document.getElementById('logoLink');a.href='https://www.sarahlittledoodles.com/';a.target='_top'})}})()</script>
 <meta name="description" content="Magic Studio : bannières, posts et stories e-commerce en moins d'une minute. Visuels HD, intégration 3D, fonds animés et effets sur mesure pour les boutiques TCG et e-commerçants.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -502,16 +502,16 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
           <div class="pick">
             <span class="pick-label"><b>1</b>Choisissez un booster</span>
             <div class="choices" id="packChoices">
-              <button type="button" class="choice" data-src="demo/pack-dracaufeu-m.webp" aria-pressed="true" aria-label="Booster Dracaufeu" style="background-image:url(demo/pack-dracaufeu-m.webp)"></button>
-              <button type="button" class="choice" data-src="demo/pack-mewtwo-m.webp" aria-pressed="false" aria-label="Booster Mewtwo" style="background-image:url(demo/pack-mewtwo-m.webp)"></button>
+              <button type="button" class="choice" data-src="demo/pack-dracaufeu-m.webp" aria-pressed="true" aria-label="Booster Dracaufeu" style="background-image:url(demo/pack-dracaufeu-t.webp)"></button>
+              <button type="button" class="choice" data-src="demo/pack-mewtwo-m.webp" aria-pressed="false" aria-label="Booster Mewtwo" style="background-image:url(demo/pack-mewtwo-t.webp)"></button>
               <label class="choice up">Votre<br>booster<input type="file" accept="image/*" id="packUp"></label>
             </div>
           </div>
           <div class="pick">
             <span class="pick-label"><b>2</b>Choisissez la carte révélée</span>
             <div class="choices" id="cardChoices">
-              <button type="button" class="choice" data-src="demo/card-mewtwo-m.webp" aria-pressed="true" aria-label="Carte Mewtwo" style="background-image:url(demo/card-mewtwo-m.webp)"></button>
-              <button type="button" class="choice" data-src="demo/card-dracaufeu-m.webp" aria-pressed="false" aria-label="Carte Dracaufeu" style="background-image:url(demo/card-dracaufeu-m.webp)"></button>
+              <button type="button" class="choice" data-src="demo/card-mewtwo-m.webp" aria-pressed="true" aria-label="Carte Mewtwo" style="background-image:url(demo/card-mewtwo-t.webp)"></button>
+              <button type="button" class="choice" data-src="demo/card-dracaufeu-m.webp" aria-pressed="false" aria-label="Carte Dracaufeu" style="background-image:url(demo/card-dracaufeu-t.webp)"></button>
               <label class="choice up">Votre<br>carte<input type="file" accept="image/*" id="cardUp"></label>
             </div>
           </div>
